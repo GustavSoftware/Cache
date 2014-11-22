@@ -1,0 +1,7 @@
+#ignore Eclipse project files
+.project
+.buildpath
+.settings
+vendor/*
+data/*
+composer.lock

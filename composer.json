@@ -1,0 +1,18 @@
+{
+    "name": "gustav/cache",
+    "type": "library",
+    "description": "A small and simple PHP cache system",
+    "keywords": ["cache"],
+    "homepage": "http://gustav.fieselschweif.de",
+    "license": "GPLv3",
+    "authors": [
+        {"name": "Chris Köcher", "email": "ckone@fieselschweif.de"}
+    ],
+    "require": {
+        "php": ">=5.4",
+        "gustav/utils": "dev-master"
+    },
+    "autoload": {
+        "psr-0": { "Gustav\\Cache\\": "libs/" }
+    }
+}
