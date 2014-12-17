@@ -246,4 +246,11 @@ class Cache implements ICache {
             unset(self::$_lockedFiles[$this->_fileName]);
         }
     }
+    
+    /**
+     * @see \IteratorAggregate::getIterator()
+     */
+    public function getIterator() {
+        return new \ArrayIterator($this->_data);
+    }
 }

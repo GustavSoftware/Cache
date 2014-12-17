@@ -29,7 +29,7 @@ namespace Gustav\Cache;
  * @package Gustav.Cache
  * @since   1.0
  */
-interface ICache {
+interface ICache extends \IteratorAggregate {
     /**
      * This method is used to open a cache-file for access on the saved data.
      * If the given file doesn't exists, an new file will be generated with the
