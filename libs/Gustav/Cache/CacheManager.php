@@ -54,7 +54,7 @@ class CacheManager {
      * 
      * @var string
      */
-    private $_implementation = "/Gustav/Cache/Filesystem/Cache";
+    private $_implementation = "\Gustav\Cache\Filesystem\Cache";
     
     /**
      * The absolute path to the directory which contains all the saved cache
