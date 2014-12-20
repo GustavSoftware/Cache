@@ -200,7 +200,8 @@ class Cache implements ICache {
         }
         
         $contents = \serialize($this->_data);
-        $return = \file_put_contents(\Gustav\ROOT_DIR . self::CACHE_DIR . $this->_fileName, $contents);
+        $return = \file_put_contents(self::$_directory . $this->_fileName,
+                $contents);
         if($return === false) {
             throw CacheException::fileUnwritable($this->_fileName);
         }
@@ -217,7 +218,7 @@ class Cache implements ICache {
         $this->_deleted = true;
         unset(self::$_openedFiles[$this->_fileName]);
         unset(self::$_lockedFiles[$this->_fileName]);
-        $return = \unlink(\Gustav\ROOT_DIR . self::CACHE_DIR . $this->_fileName);
+        $return = \unlink(self::$_directory . $this->_fileName);
         if($return === false) {
             throw CacheException::fileUndeletable($this->_fileName);
         }
