@@ -101,7 +101,8 @@ class CacheManager {
      */
     public function getDirectory() {
         if($this->_dir === null) {
-            $this->_dir = \dirname(\dirname(\dirname(__DIR__))) . self::_DIR;
+            $this->_dir = \dirname(\dirname(\dirname(__DIR__))) . "/"
+                    . self::_DIR;
         }
         return $this->_dir;
     }
