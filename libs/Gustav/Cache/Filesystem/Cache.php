@@ -112,6 +112,9 @@ class Cache implements ICache {
         //try to load from file system
         if(self::$_directory === null) {
             self::$_directory = CacheManager::getInstance()->getDirectory();
+            if(!\file_exists(self::$_directory)) {
+                \mkdir(self::$_directory);
+            }
         }
         
         if(\mb_strpos($fileName, "..") !== false ||

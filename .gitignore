@@ -3,4 +3,5 @@
 .buildpath
 .settings
 vendor/*
+cache/*
 composer.lock
