@@ -94,6 +94,18 @@ class CacheManager {
     }
     
     /**
+     * Sets the directory where the cache files can be saved. Consider that this
+     * path should be absolute.
+     * 
+     * @param  string                     $dir The directory
+     * @return \Gustav\Cache\CacheManager      This object
+     */
+    public function setDirectory($dir) {
+        $this->_dir = (string) $dir;
+        return $this;
+    }
+    
+    /**
      * Returns the directory where the cache files can be saved. This path is
      * an absolute path.
      * 
