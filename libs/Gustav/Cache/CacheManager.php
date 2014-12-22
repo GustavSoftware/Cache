@@ -21,7 +21,7 @@
 namespace Gustav\Cache;
 
 use \Gustav\Utils\Miscellaneous,
-    \Gustav\Utils\Singleton;
+    \Gustav\Utils\TSingleton;
 
 /**
  * This class manages all the cache files and the implementations of caches.
@@ -35,7 +35,7 @@ class CacheManager {
     /**
      * Use the singleton design pattern.
      */
-    use Singleton;
+    use TSingleton;
     
     /**
      * The directory which can contain all the saved cache files. This path is
