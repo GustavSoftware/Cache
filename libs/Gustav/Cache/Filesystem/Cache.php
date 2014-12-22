@@ -38,7 +38,7 @@ class Cache implements ICache {
     /**
      * This is an array that contains all opened cache files.
      *
-     * @var       array
+     * @var       \Gustav\Cache\Filesystem\Cache[]
      * @staticvar
      */
     private static $_openedFiles = array();
@@ -46,7 +46,7 @@ class Cache implements ICache {
     /**
      * This is an array that contains all locked cache files.
      *
-     * @var       array
+     * @var       \Gustav\Cache\Filesystem\Cache[]
      * @staticvar
      */
     private static $_lockedFiles = array();
@@ -81,6 +81,15 @@ class Cache implements ICache {
      * @var boolean
      */
     private $_deleted = false;
+    
+    /**
+     * This field indicates whether this cache file has changed on runtime
+     * (true) or not (false). If this is false \Gustav\Cache\ICache::saveFile()
+     * doesn't do anything.
+     *  
+     * @var boolean
+     */
+    private $_updated = false;
     
     /**
      * The constructor of this class. This constructor is private. To open a
@@ -144,7 +153,7 @@ class Cache implements ICache {
         }
         self::$_openedFiles[$fileName] = new self($fileName, $data);
         if($data) {
-            self::$_openedFiles[$fileName]->saveFile();
+            self::$_openedFiles[$fileName]->saveFile(true);
         }
         
         return self::$_openedFiles[$fileName];
@@ -176,6 +185,7 @@ class Cache implements ICache {
         
         $key = (string) $key;
         $this->_data[$key] = $value;
+        $this->_deleted = true;
     }
     
     /**
@@ -189,6 +199,7 @@ class Cache implements ICache {
         $key = (string) $key;
         if(isset($this->_data[$key])) {
             unset($this->_data[$key]);
+            $this->_deleted = true;
         } else {
             ErrorHandler::setWarning("cache key \"{$key}\" not found");
         }
@@ -197,9 +208,12 @@ class Cache implements ICache {
     /**
      * @see \Gustav\Cache\ICache::saveFile()
      */
-    public function saveFile() {
+    public function saveFile($force = false) {
         if($this->_deleted === true) {
             throw CacheException::fileDeleted($this->_fileName);
+        }
+        if($force !== true && $this->_deleted === false) { //not changed...
+            return;
         }
         
         $contents = \serialize($this->_data);
@@ -208,6 +222,7 @@ class Cache implements ICache {
         if($return === false) {
             throw CacheException::fileUnwritable($this->_fileName);
         }
+        $this->_updated = false;
     }
     
     /**

@@ -51,7 +51,7 @@ interface ICache extends \IteratorAggregate {
      * @param  string                       $key The key
      * @return mixed                             The value
      * @throws \Gustav\Cache\CacheException      File is deleted
-    */
+     */
     public function getData($key);
     
     /**
@@ -60,7 +60,7 @@ interface ICache extends \IteratorAggregate {
      * @param  string                       $key   The key
      * @param  mixed                        $value The new value
      * @throws \Gustav\Cache\CacheException        File is deleted
-    */
+     */
     public function setData($key, $value);
     
     /**
@@ -68,21 +68,26 @@ interface ICache extends \IteratorAggregate {
      *
      * @param  string                       $key The key
      * @throws \Gustav\Cache\CacheException      File is deleted
-    */
+     */
     public function unsetData($key);
     
     /**
-     * Saves the cache-file.
+     * Saves the cache-file. If the argument is true, the saving process will
+     * be forced (even if no data has changed). Otherwise the cache-file will
+     * only be saved if data was updated. This is the default behavior.
      *
-     * @throws \Gustav\Cache\CacheException Writing failed or file is deleted
-    */
-    public function saveFile();
+     * @param  boolean                      $force true, if saving should be
+     *                                             forced, otherwise false
+     * @throws \Gustav\Cache\CacheException        Writing failed or file is
+     *                                             deleted
+     */
+    public function saveFile($force = false);
     
     /**
      * Deletes the cache-file.
      *
      * @throws \Gustav\Cache\CacheException Deleting failed or file is deleted
-    */
+     */
     public function deleteFile();
     
     /**
@@ -90,13 +95,13 @@ interface ICache extends \IteratorAggregate {
      * components until termination of this script.
      *
      * @throws \Gustav\Cache\CacheException File is deleted
-    */
+     */
     public function lockFile();
     
     /**
      * Removes the lock of this file.
      *
      * @throws \Gustav\Cache\CacheException File is deleted
-    */
+     */
     public function unlockFile();
 }
