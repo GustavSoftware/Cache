@@ -36,7 +36,7 @@ use \Gustav\Utils\GustavException;
  * 
  * @author  Chris Köcher <ckone@fieselschweif.de>
  * @link    http://gustav.fieselschweif.de
- * @package Gustav.Cms.Model.Cache
+ * @package Gustav.Cache
  * @since   1.0
  */
 class CacheException extends GustavException {
