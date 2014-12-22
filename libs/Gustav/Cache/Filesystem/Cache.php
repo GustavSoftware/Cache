@@ -185,7 +185,7 @@ class Cache implements ICache {
         
         $key = (string) $key;
         $this->_data[$key] = $value;
-        $this->_deleted = true;
+        $this->_updated = true;
     }
     
     /**
@@ -199,7 +199,7 @@ class Cache implements ICache {
         $key = (string) $key;
         if(isset($this->_data[$key])) {
             unset($this->_data[$key]);
-            $this->_deleted = true;
+            $this->_updated = true;
         } else {
             ErrorHandler::setWarning("cache key \"{$key}\" not found");
         }
