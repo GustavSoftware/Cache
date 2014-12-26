@@ -206,6 +206,18 @@ class Cache implements ICache {
     }
     
     /**
+     * @see \Gustav\Cache\ICache::hasData()
+     */
+    public function hasData($key) {
+        if($this->_deleted === true) {
+            throw CacheException::fileDeleted($this->_fileName);
+        }
+        
+        $key = (string) $key;
+        return isset($this->_data[$key]);
+    }
+    
+    /**
      * @see \Gustav\Cache\ICache::saveFile()
      */
     public function saveFile($force = false) {

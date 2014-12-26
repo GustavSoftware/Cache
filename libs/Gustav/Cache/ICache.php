@@ -72,6 +72,17 @@ interface ICache extends \IteratorAggregate {
     public function unsetData($key);
     
     /**
+     * Checks if the cache file contains a value that is mapped to the given
+     * key.
+     * 
+     * @param  string                       $key The key
+     * @return boolean                           true, if data exists, otherwise
+     *                                           false
+     * @throws \Gustav\Cache\CacheException      File is deleted
+     */
+    public function hasData($key);
+    
+    /**
      * Saves the cache-file. If the argument is true, the saving process will
      * be forced (even if no data has changed). Otherwise the cache-file will
      * only be saved if data was updated. This is the default behavior.
