@@ -237,7 +237,7 @@ class Cache implements ICache {
         if($this->_deleted === true) {
             throw CacheException::fileDeleted($this->_fileName);
         }
-        if($force !== true && $this->_deleted === false) { //not changed...
+        if($force !== true && $this->_updated === false) { //not changed...
             return;
         }
         
