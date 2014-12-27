@@ -22,6 +22,7 @@ namespace Gustav\Cache\Filesystem;
 
 use \Gustav\Cache\CacheException,
     \Gustav\Cache\CacheManager,
+    \Gustav\Cache\Configuration,
     \Gustav\Cache\ICache,
     \Gustav\Utils\ErrorHandler;
 
@@ -52,15 +53,6 @@ class Cache implements ICache {
     private static $_lockedFiles = array();
     
     /**
-     * This is the absolute path to the directory where all the cache files are
-     * saved.
-     * 
-     * @var       string
-     * @staticvar
-     */
-    private static $_directory;
-    
-    /**
      * This is the name of the current opened cache file.
      *
      * @var string
@@ -68,11 +60,25 @@ class Cache implements ICache {
     private $_fileName;
     
     /**
+     * The full file system path to the cache file.
+     * 
+     * @var string
+     */
+    private $_filePath;
+    
+    /**
      * This array contains all the saved data in this cache file.
      *
      * @var array
      */
     private $_data;
+    
+    /**
+     * The configuration of this cache file.
+     *
+     * @var \Gustav\Cache\Configuration
+     */
+    private $_config;
     
     /**
      * This attribute indicates whether the cache file is deleted (true) or not
@@ -95,43 +101,48 @@ class Cache implements ICache {
      * The constructor of this class. This constructor is private. To open a
      * cache file use \Gustav\Cache\ICache::openFile().
      *
-     * @param string $fileName The file-name
-     * @param array  $data     The data
+     * @param string                      $fileName The file-name
+     * @param string                      $filePath The full path to the cache
+     *                                              file
+     * @param array                       $data     The data
+     * @param \Gustav\Cache\Configuration $config   Some configurations
      */
-    private function __construct($fileName, $data = array()) {
+    private function __construct($fileName, $filePath, array $data,
+            Configuration $config) {
         $this->_fileName = (string) $fileName;
-        $this->_data = (array) $data;
+        $this->_filePath = (string) $filePath;
+        $this->_data = $data;
+        $this->_config = $config;
     }
     
     /**
      * @see \Gustav\Cache\ICache::openFile()
      */
-    public static function openFile($fileName, callable $creator = null) {
+    public static function openFile($fileName, Configuration $config,
+            callable $creator = null) {
         $fileName = (string) $fileName;
+        $filePath = $config->getDirectory() . $fileName;
         $data = array();
         
         //already opened?
-        if(isset(self::$_openedFiles[$fileName])) {
-            if(isset(self::$_lockedFiles[$fileName])) {
+        if(isset(self::$_openedFiles[$filePath])) {
+            if(isset(self::$_lockedFiles[$filePath])) {
                 throw CacheException::fileLocked($fileName);
             }
-            return self::$_openedFiles[$fileName];
+            return self::$_openedFiles[$filePath];
         }
         
         //try to load from file system
-        if(self::$_directory === null) {
-            self::$_directory = CacheManager::getInstance()->getDirectory();
-            if(!\file_exists(self::$_directory)) {
-                \mkdir(self::$_directory);
-            }
+        if(!\file_exists($config->getDirectory())) {
+            \mkdir($config->getDirectory());
         }
         
         if(\mb_strpos($fileName, "..") !== false ||
                 \mb_strpos($fileName, "/") !== false) {
             throw CacheException::badFileName($fileName);
         }
-        if(\file_exists(self::$_directory . $fileName)) {
-            $contents = \file_get_contents(self::$_directory . $fileName);
+        if(\file_exists($filePath)) {
+            $contents = \file_get_contents($filePath);
             if($contents === false) {
                 if($creator !== null) { //try to generate the data automatically
                     $data = \call_user_func($creator);
@@ -142,21 +153,23 @@ class Cache implements ICache {
             } else {
                 $data = \unserialize($contents);
             }
-            self::$_openedFiles[$fileName] = new self($fileName, $data);
+            self::$_openedFiles[$filePath] = new self($fileName, $filePath,
+                    $data, $config);
             
-            return self::$_openedFiles[$fileName];
+            return self::$_openedFiles[$filePath];
         }
         
         //create a new file
         if($creator !== null) {
             $data = \call_user_func($creator);
         }
-        self::$_openedFiles[$fileName] = new self($fileName, $data);
+        self::$_openedFiles[$filePath] = new self($fileName, $filePath, $data,
+                $config);
         if($data) {
-            self::$_openedFiles[$fileName]->saveFile(true);
+            self::$_openedFiles[$filePath]->saveFile(true);
         }
         
-        return self::$_openedFiles[$fileName];
+        return self::$_openedFiles[$filePath];
     }
     
     /**
@@ -229,10 +242,9 @@ class Cache implements ICache {
         }
         
         $contents = \serialize($this->_data);
-        $return = \file_put_contents(self::$_directory . $this->_fileName,
-                $contents);
+        $return = \file_put_contents($this->_filePath, $contents);
         if($return === false) {
-            throw CacheException::fileUnwritable($this->_fileName);
+            throw CacheException::fileUnwritable($this->_filePath);
         }
         $this->_updated = false;
     }
@@ -246,9 +258,9 @@ class Cache implements ICache {
         }
         
         $this->_deleted = true;
-        unset(self::$_openedFiles[$this->_fileName]);
-        unset(self::$_lockedFiles[$this->_fileName]);
-        $return = \unlink(self::$_directory . $this->_fileName);
+        unset(self::$_openedFiles[$this->_filePath]);
+        unset(self::$_lockedFiles[$this->_filePath]);
+        $return = \unlink($this->_filePath);
         if($return === false) {
             throw CacheException::fileUndeletable($this->_fileName);
         }
@@ -262,7 +274,7 @@ class Cache implements ICache {
             throw CacheException::fileDeleted($this->_fileName);
         }
         
-        self::$_lockedFiles[$this->_fileName] = true;
+        self::$_lockedFiles[$this->_filePath] = true;
     }
     
     /**
@@ -273,8 +285,8 @@ class Cache implements ICache {
             throw CacheException::fileDeleted($this->_fileName);
         }
         
-        if(isset(self::$_lockedFiles[$this->_fileName])) {
-            unset(self::$_lockedFiles[$this->_fileName]);
+        if(isset(self::$_lockedFiles[$this->_filePath])) {
+            unset(self::$_lockedFiles[$this->_filePath]);
         }
     }
     

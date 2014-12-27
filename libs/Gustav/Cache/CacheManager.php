@@ -20,8 +20,7 @@
 
 namespace Gustav\Cache;
 
-use \Gustav\Utils\Miscellaneous,
-    \Gustav\Utils\TSingleton;
+use \Gustav\Utils\Miscellaneous;
 
 /**
  * This class manages all the cache files and the implementations of caches.
@@ -33,90 +32,28 @@ use \Gustav\Utils\Miscellaneous,
  */
 class CacheManager {
     /**
-     * Use the singleton design pattern.
+     * Some additional configuration of this cache manager.
+     * 
+     * @var \Gustav\Cache\Configuration
      */
-    use TSingleton;
+    private $_config;
     
     /**
-     * The directory which can contain all the saved cache files. This path is
-     * relative to this projects root directory. Consider, that this constant
-     * is internal and should not be used in any cache implementation. Please
-     * use the method \Gustav\Cache\CacheManager::getDirectory() instead.
+     * Constructor of this class. Sets the configuration of the cache system.
      * 
-     * @var string
+     * @param \Gustav\Cache\Configuration $config Some configurations
      */
-    const _DIR = "data/";
-    
-    /**
-     * This is the class name of the implementation of the cache files that
-     * should be used on runtime. Consider that this class has to implement the
-     * ICache interface.
-     * 
-     * @var string
-     */
-    private $_implementation = "\Gustav\Cache\Filesystem\Cache";
-    
-    /**
-     * The absolute path to the directory which contains all the saved cache
-     * files.
-     * 
-     * @var string
-     */
-    private $_dir;
-    
-    /**
-     * Sets the class name of the implementation of the cache files that should
-     * be used on runtime. Consider that this class name has to implement the
-     * ICache interface. Otherwise this method will throw an CacheException.
-     * 
-     * @param  string                       $className The class name
-     * @return \Gustav\Cache\CacheManager              This object
-     * @throws \Gustav\Cache\CacheException            Invalid implementation
-     */
-    public function setImplementation($className) {
-        $className = (string) $className;
-        if(!Miscellaneous::implementsInterface($className,
-                "\Gustav\Cache\ICache")) {
-            throw CacheException::invalidImplementation($className);
-        }
-        $this->_implementation = $className;
-        return $this;
+    public function __construct(Configuration $config) {
+        $this->_config = $config;
     }
     
     /**
-     * Returns the class name of the implementation of the cache files that
-     * should be used on runtime.
+     * Returns the configuration object of this cache system.
      * 
-     * @return string The class name
+     * @return \Gustav\Cache\Configuration The configuration
      */
-    public function getImplementation() {
-        return $this->_implementation;
-    }
-    
-    /**
-     * Sets the directory where the cache files can be saved. Consider that this
-     * path should be absolute.
-     * 
-     * @param  string                     $dir The directory
-     * @return \Gustav\Cache\CacheManager      This object
-     */
-    public function setDirectory($dir) {
-        $this->_dir = (string) $dir;
-        return $this;
-    }
-    
-    /**
-     * Returns the directory where the cache files can be saved. This path is
-     * an absolute path.
-     * 
-     * @return string The path where the cache files can be saved
-     */
-    public function getDirectory() {
-        if($this->_dir === null) {
-            $this->_dir = \dirname(\dirname(\dirname(__DIR__))) . "/"
-                    . self::_DIR;
-        }
-        return $this->_dir;
+    public function getConfiguration() {
+        return $this->_config;
     }
     
     /**
@@ -129,7 +66,7 @@ class CacheManager {
      * @static
      */
     public function getCache($fileName, callable $creator = null) {
-        $impl = $this->getImplementation();
-        return $impl::openFile($fileName, $creator);
+        $impl = $this->_config->getImplementation();
+        return $impl::openFile($fileName, $this->_config, $creator);
     }
 }
