@@ -199,6 +199,7 @@ class Cache implements ICache {
         $key = (string) $key;
         $this->_data[$key] = $value;
         $this->_updated = true;
+        return $this;
     }
     
     /**
@@ -216,6 +217,7 @@ class Cache implements ICache {
         } else {
             ErrorHandler::setWarning("cache key \"{$key}\" not found");
         }
+        return $this;
     }
     
     /**
@@ -228,6 +230,18 @@ class Cache implements ICache {
         
         $key = (string) $key;
         return isset($this->_data[$key]);
+    }
+    
+    /**
+     * @see \Gustav\Cache\ICache::clearFile()
+     */
+    public function clearFile() {
+        if($this->_deleted === true) {
+            throw CacheException::fileDeleted($this->_fileName);
+        }
+        $this->_data = array();
+        $this->_updated = true;
+        return $this;
     }
     
     /**
@@ -247,6 +261,7 @@ class Cache implements ICache {
             throw CacheException::fileUnwritable($this->_filePath);
         }
         $this->_updated = false;
+        return $this;
     }
     
     /**
@@ -275,6 +290,7 @@ class Cache implements ICache {
         }
         
         self::$_lockedFiles[$this->_filePath] = true;
+        return $this;
     }
     
     /**
@@ -288,6 +304,7 @@ class Cache implements ICache {
         if(isset(self::$_lockedFiles[$this->_filePath])) {
             unset(self::$_lockedFiles[$this->_filePath]);
         }
+        return $this;
     }
     
     /**

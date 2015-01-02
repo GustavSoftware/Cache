@@ -61,6 +61,7 @@ interface ICache extends \IteratorAggregate {
      *
      * @param  string                       $key   The key
      * @param  mixed                        $value The new value
+     * @return \Gustav\Cache\ICache                This object
      * @throws \Gustav\Cache\CacheException        File is deleted
      */
     public function setData($key, $value);
@@ -69,6 +70,7 @@ interface ICache extends \IteratorAggregate {
      * Removes the value that belongs to the given key from this file.
      *
      * @param  string                       $key The key
+     * @return \Gustav\Cache\ICache                This object
      * @throws \Gustav\Cache\CacheException      File is deleted
      */
     public function unsetData($key);
@@ -85,19 +87,33 @@ interface ICache extends \IteratorAggregate {
     public function hasData($key);
     
     /**
+     * Removes all saved data from this cache-file. In contrast to
+     * \Gustav\Cache\ICache::deleteFile() the file wil not be removed from this
+     * cache system. Only the content of the file will be cleared. New data can
+     * be inserted afterwards.
+     * 
+     * @return \Gustav\Cache\ICache         This object
+     * @throws \Gustav\Cache\CacheException File is deleted
+     */
+    public function clearFile();
+    
+    /**
      * Saves the cache-file. If the argument is true, the saving process will
      * be forced (even if no data has changed). Otherwise the cache-file will
      * only be saved if data was updated. This is the default behavior.
      *
      * @param  boolean                      $force true, if saving should be
      *                                             forced, otherwise false
+     * @return \Gustav\Cache\ICache                This object
      * @throws \Gustav\Cache\CacheException        Writing failed or file is
      *                                             deleted
      */
     public function saveFile($force = false);
     
     /**
-     * Deletes the cache-file.
+     * Deletes the cache-file. In contrast to \Gustav\Cache\ICache::clearFile()
+     * this method deletes the cache file from this cache system. No data can
+     * be inserted afterwards.
      *
      * @throws \Gustav\Cache\CacheException Deleting failed or file is deleted
      */
@@ -106,14 +122,16 @@ interface ICache extends \IteratorAggregate {
     /**
      * Sets a lock on this file. So the file can't be loaded by other
      * components until termination of this script.
-     *
+     * 
+     * @return \Gustav\Cache\ICache         This object
      * @throws \Gustav\Cache\CacheException File is deleted
      */
     public function lockFile();
     
     /**
      * Removes the lock of this file.
-     *
+     * 
+     * @return \Gustav\Cache\ICache         This object
      * @throws \Gustav\Cache\CacheException File is deleted
      */
     public function unlockFile();
