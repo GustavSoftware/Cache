@@ -33,7 +33,8 @@ use \Gustav\Utils\GustavException;
  * 5 - File can't be read.
  * 6 - File can't be written.
  * 7 - File can't be deleted.
- * 
+ * 8 - File can't be modified as its contents are outdated.
+ *
  * @author  Chris Köcher <ckone@fieselschweif.de>
  * @link    http://gustav.fieselschweif.de
  * @package Gustav.Cache
@@ -50,6 +51,7 @@ class CacheException extends GustavException {
     const FILE_UNREADABLE = 5;
     const FILE_UNWRITABLE = 6;
     const FILE_UNDELETABLE = 7;
+    const FILE_OUTDATED = 8;
     
     /**
      * This method creates an exception if the given class name of the cache
@@ -155,5 +157,21 @@ class CacheException extends GustavException {
         $fileName = (string) $fileName;
         return new self("cannot delete file: {$fileName}",
                 self::FILE_UNDELETABLE, $previous);
+    }
+
+    /**
+     * This method creates an exception if modification of this file is not
+     * possible anymore as its contents are outdated.
+     *
+     * @param  string                       $fileName The file-name
+     * @param  \Exception                   $previous Previous exception
+     * @return \Gustav\Cache\CacheException           The new exception
+     * @static
+     */
+    public static function fileOutdated($fileName,
+            \Exception $previous = null) {
+        $fileName = (string) $fileName;
+        return new self("outdated file: {$fileName}",
+                self::FILE_OUTDATED, $previous);
     }
 }

@@ -106,7 +106,7 @@ interface ICache extends \IteratorAggregate {
      *                                             forced, otherwise false
      * @return \Gustav\Cache\ICache                This object
      * @throws \Gustav\Cache\CacheException        Writing failed or file is
-     *                                             deleted
+     *                                             deleted or file is outdated
      */
     public function saveFile($force = false);
     
@@ -116,6 +116,7 @@ interface ICache extends \IteratorAggregate {
      * be inserted afterwards.
      *
      * @throws \Gustav\Cache\CacheException Deleting failed or file is deleted
+     *                                      or file is outdated
      */
     public function deleteFile();
     

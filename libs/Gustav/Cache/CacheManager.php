@@ -20,8 +20,6 @@
 
 namespace Gustav\Cache;
 
-use \Gustav\Utils\Miscellaneous;
-
 /**
  * This class manages all the cache files and the implementations of caches.
  * 
@@ -57,7 +55,7 @@ class CacheManager {
     }
     
     /**
-     * This method creates an object for managment of an cache-file.
+     * This method creates an object for management of an cache-file.
      *
      * @param  string               $fileName The name of the cache-file
      * @param  callable             $creator  An additional operation for

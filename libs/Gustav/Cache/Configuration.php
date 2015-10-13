@@ -20,6 +20,8 @@
 
 namespace Gustav\Cache;
 
+use \Gustav\Utils\Miscellaneous;
+
 /**
  * This class is used for some important configurations of this cache system.
  * 
@@ -36,7 +38,7 @@ class Configuration {
      *
      * @var string
      */
-    private $_implementation = "\Gustav\Cache\Filesystem\Cache";
+    private $_implementation = "\\Gustav\\Cache\\Filesystem\\Cache";
     
     /**
      * The absolute path to the directory which contains all the saved cache
@@ -58,7 +60,7 @@ class Configuration {
     public function setImplementation($className) {
         $className = (string) $className;
         if(!Miscellaneous::implementsInterface($className,
-            "\Gustav\Cache\ICache")) {
+                "\\Gustav\\Cache\\ICache")) {
             throw CacheException::invalidImplementation($className);
         }
         $this->_implementation = $className;
