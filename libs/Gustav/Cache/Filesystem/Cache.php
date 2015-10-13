@@ -363,7 +363,7 @@ class Cache implements ICache {
      * @return boolean      true, if the data is valid, otherwise false
      */
     private function _isValid($key) {
-        return $this->_data[$key]['expires'] < 0 ||
+        return $this->_data[$key]['expires'] <= 0 ||
                 $this->_data[$key]['expires'] > \time();
     }
 }
