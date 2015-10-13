@@ -74,7 +74,11 @@ class Cache implements ICache {
     private $_lastUpdate = 0;
     
     /**
-     * This array contains all the saved data in this cache file.
+     * This array contains all the saved data in this cache file. Each array
+     * element is an array of two elements:
+     * - 'expires' - The UNIX timestamp of the expiration date of the cache data
+     *               (or 0, if the data doesn't expire)
+     * - 'value' - The cached value
      *
      * @var array
      */
@@ -193,7 +197,10 @@ class Cache implements ICache {
         
         $key = (string) $key;
         if(isset($this->_data[$key])) {
-            return $this->_data[$key];
+            if($this->_isValid($key)) {
+                return $this->_data[$key]['value'];
+            }
+            unset($this->_data[$key]);
         }
         ErrorHandler::setWarning("cache key \"{$key}\" not found");
         return null;
@@ -202,13 +209,21 @@ class Cache implements ICache {
     /**
      * {@inheritDoc}
      */
-    public function setData($key, $value) {
+    public function setData($key, $value, $validity = 0) {
         if($this->_deleted === true) {
             throw CacheException::fileDeleted($this->_fileName);
         }
+
+        $validity = (int) $validity;
+        if($validity > 0) {
+            $validity += \time();
+        }
         
         $key = (string) $key;
-        $this->_data[$key] = $value;
+        $this->_data[$key] = array(
+            'expires' => $validity,
+            'value' => $value
+        );
         $this->_updated = true;
         return $this;
     }
@@ -240,7 +255,13 @@ class Cache implements ICache {
         }
         
         $key = (string) $key;
-        return isset($this->_data[$key]);
+        if(isset($this->_data[$key])) {
+            if($this->_isValid($key)) {
+                return true;
+            }
+            unset($this->_data[$key]);
+        }
+        return false;
     }
     
     /**
@@ -333,5 +354,16 @@ class Cache implements ICache {
      */
     public function getIterator() {
         return new \ArrayIterator($this->_data);
+    }
+
+    /**
+     * Checks whether the given data with the given key is valid.
+     *
+     * @param  string  $key The key
+     * @return boolean      true, if the data is valid, otherwise false
+     */
+    private function _isValid($key) {
+        return $this->_data[$key]['expires'] < 0 ||
+                $this->_data[$key]['expires'] > \time();
     }
 }

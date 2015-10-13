@@ -57,20 +57,25 @@ interface ICache extends \IteratorAggregate {
     public function getData($key);
     
     /**
-     * Changes the value that belongs to the given key in this file.
+     * Changes the value that belongs to the given key in this file. The third
+     * optional argument sets how long the data will be valid (in seconds).
+     * After this time period \Gustav\Cache\ICache::hasData() will return false
+     * and remove this value. If this value isn't a positive integer, the data
+     * will not expire.
      *
-     * @param  string                       $key   The key
-     * @param  mixed                        $value The new value
-     * @return \Gustav\Cache\ICache                This object
-     * @throws \Gustav\Cache\CacheException        File is deleted
+     * @param  string                       $key      The key
+     * @param  mixed                        $value    The new value
+     * @param  integer                      $validity The time until expiration
+     * @return \Gustav\Cache\ICache                   This object
+     * @throws \Gustav\Cache\CacheException           File is deleted
      */
-    public function setData($key, $value);
+    public function setData($key, $value, $validity = 0);
     
     /**
      * Removes the value that belongs to the given key from this file.
      *
      * @param  string                       $key The key
-     * @return \Gustav\Cache\ICache                This object
+     * @return \Gustav\Cache\ICache              This object
      * @throws \Gustav\Cache\CacheException      File is deleted
      */
     public function unsetData($key);
