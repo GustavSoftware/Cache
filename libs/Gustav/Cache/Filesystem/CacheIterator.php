@@ -1,8 +1,8 @@
 <?php
 
 /*
- * Gustav ORM - A simple PHP framework for object-relational mappings.
- * Copyright (C) 2014-2015  Gustav Software
+ * Gustav Cache - A small and simple PHP cache system.
+ * Copyright (C) 2014-2016  Gustav Software
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ namespace Gustav\Cache\Filesystem;
  *
  * @author  Chris Köcher <ckone@fieselschweif.de>
  * @link    http://gustav.fieselschweif.de
- * @package Gustav.Orm.Filesystem
+ * @package Gustav.Cache.Filesystem
  * @since   1.0
  */
 class CacheIterator implements \Iterator {
