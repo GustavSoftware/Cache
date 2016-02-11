@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Gustav\Cache\Filesystem;
+namespace Gustav\Cache\Debug;
 
 use \Gustav\Cache\CacheException,
     \Gustav\Cache\Configuration,
@@ -26,71 +26,53 @@ use \Gustav\Cache\CacheException,
     \Gustav\Utils\ErrorHandler;
 
 /**
- * This class implements the cache-interface. All the data is saved serialized
- * on file-system.
- * 
+ * This class implements the cache-interface. This cache will not store any
+ * data. The purpose of this implementation is debugging of the software that
+ * uses this cache.
+ *
  * @author  Chris Köcher <ckone@fieselschweif.de>
  * @link    http://gustav.fieselschweif.de
- * @package Gustav.Cache.Filesystem
+ * @package Gustav.Cache.Debug
  * @since   1.0
  */
 class Cache implements ICache {
     /**
      * This is an array that contains all opened cache files.
      *
-     * @var    \Gustav\Cache\Filesystem\Cache[]
+     * @var    \Gustav\Cache\Debug\Cache[]
      * @static
      */
     private static $_openedFiles = array();
-    
+
     /**
      * This is an array that contains all locked cache files.
      *
-     * @var    \Gustav\Cache\Filesystem\Cache[]
+     * @var    \Gustav\Cache\Debug\Cache[]
      * @static
      */
     private static $_lockedFiles = array();
-    
+
     /**
      * This is the name of the current opened cache file.
      *
      * @var string
      */
     private $_fileName;
-    
+
     /**
      * The full file system path to the cache file.
-     * 
+     *
      * @var string
      */
     private $_filePath;
 
     /**
-     * The timestamp of the last update of the cache file. This is needed to
-     * avoid some problems with concurrency.
-     *
-     * @var integer
-     */
-    private $_lastUpdate = 0;
-    
-    /**
-     * This array contains all the saved data in this cache file. Each array
-     * element is an array of two elements:
-     * - 'expires' - The UNIX timestamp of the expiration date of the cache data
-     *               (or 0, if the data does not expire)
-     * - 'value' - The cached value
+     * This array contains all the saved data in this cache file.
      *
      * @var array
      */
     private $_data;
-    
-    /**
-     * The configuration of this cache file.
-     *
-     * @var \Gustav\Cache\Configuration
-     */
-    private $_config;
-    
+
     /**
      * This attribute indicates whether the cache file is deleted (true) or not
      * (false).
@@ -98,37 +80,21 @@ class Cache implements ICache {
      * @var boolean
      */
     private $_deleted = false;
-    
-    /**
-     * This field indicates whether this cache file has changed on runtime
-     * (true) or not (false). If this is false \Gustav\Cache\ICache::saveFile()
-     * does not do anything.
-     *  
-     * @var boolean
-     */
-    private $_updated = false;
-    
+
     /**
      * The constructor of this class. This constructor is private. To open a
      * cache file use \Gustav\Cache\ICache::openFile().
      *
-     * @param string                      $fileName   The file-name
-     * @param string                      $filePath   The full path to the cache
-     *                                                file
-     * @param integer                     $lastUpdate The time of last update of
-     *                                                the cache file
-     * @param array                       $data       The data
-     * @param \Gustav\Cache\Configuration $config     Some configurations
+     * @param string $fileName The file-name
+     * @param string $filePath The full path to the cache file
+     * @param array  $data     The data
      */
-    private function __construct($fileName, $filePath, $lastUpdate, array $data,
-            Configuration $config) {
+    private function __construct($fileName, $filePath, array $data) {
         $this->_fileName = (string) $fileName;
         $this->_filePath = (string) $filePath;
-        $this->_lastUpdate = (int) $lastUpdate;
         $this->_data = $data;
-        $this->_config = $config;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -137,7 +103,7 @@ class Cache implements ICache {
         $fileName = (string) $fileName;
         $filePath = $config->getDirectory() . $fileName;
         $data = array();
-        
+
         //already opened?
         if(isset(self::$_openedFiles[$filePath])) {
             if(isset(self::$_lockedFiles[$filePath])) {
@@ -145,48 +111,28 @@ class Cache implements ICache {
             }
             return self::$_openedFiles[$filePath];
         }
-        
-        //try to load from file system
-        if(!\file_exists($config->getDirectory())) {
-            \mkdir($config->getDirectory());
-        }
-        
+
         if(\mb_strpos($fileName, "..") !== false ||
-                \mb_strpos($fileName, "/") !== false) {
+            \mb_strpos($fileName, "/") !== false) {
             throw CacheException::badFileName($fileName);
         }
-        if(\file_exists($filePath)) {
-            $lastUpdate = \filemtime($filePath);
-            $contents = \file_get_contents($filePath);
-            if($contents === false) {
-                if($creator !== null) { //try to generate the data automatically
-                    $data = \call_user_func($creator);
-                    ErrorHandler::setWarning("cannot read cache file");
-                } else {
-                    throw CacheException::fileUnreadable($fileName);
-                }
-            } else {
-                $data = \unserialize($contents);
-            }
-            self::$_openedFiles[$filePath] = new self($fileName, $filePath,
-                    $lastUpdate, $data, $config);
-            
-            return self::$_openedFiles[$filePath];
-        }
-        
+
         //create a new file
         if($creator !== null) {
             $data = \call_user_func($creator);
         }
-        self::$_openedFiles[$filePath] = new self($fileName, $filePath, 0,
-                $data, $config);
-        if($data) {
-            self::$_openedFiles[$filePath]->saveFile(true);
-        }
-        
+        self::$_openedFiles[$filePath] = new self($fileName, $filePath, $data);
+
         return self::$_openedFiles[$filePath];
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getIterator() {
+        return new \ArrayIterator($this->_data);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -194,18 +140,15 @@ class Cache implements ICache {
         if($this->_deleted === true) {
             throw CacheException::fileDeleted($this->_fileName);
         }
-        
+
         $key = (string) $key;
         if(isset($this->_data[$key])) {
-            if($this->_isValid($key)) {
-                return $this->_data[$key]['value'];
-            }
-            unset($this->_data[$key]);
+            return $this->_data[$key];
         }
         ErrorHandler::setWarning("cache key \"{$key}\" not found");
         return null;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -214,20 +157,11 @@ class Cache implements ICache {
             throw CacheException::fileDeleted($this->_fileName);
         }
 
-        $validity = (int) $validity;
-        if($validity > 0) {
-            $validity += \time();
-        }
-        
         $key = (string) $key;
-        $this->_data[$key] = array(
-            'expires' => $validity,
-            'value' => $value
-        );
-        $this->_updated = true;
+        $this->_data[$key] = $value;
         return $this;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -235,17 +169,16 @@ class Cache implements ICache {
         if($this->_deleted === true) {
             throw CacheException::fileDeleted($this->_fileName);
         }
-        
+
         $key = (string) $key;
         if(isset($this->_data[$key])) {
             unset($this->_data[$key]);
-            $this->_updated = true;
         } else {
             ErrorHandler::setWarning("cache key \"{$key}\" not found");
         }
         return $this;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -253,17 +186,11 @@ class Cache implements ICache {
         if($this->_deleted === true) {
             throw CacheException::fileDeleted($this->_fileName);
         }
-        
+
         $key = (string) $key;
-        if(isset($this->_data[$key])) {
-            if($this->_isValid($key)) {
-                return true;
-            }
-            unset($this->_data[$key]);
-        }
-        return false;
+        return isset($this->_data[$key]);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -272,35 +199,17 @@ class Cache implements ICache {
             throw CacheException::fileDeleted($this->_fileName);
         }
         $this->_data = array();
-        $this->_updated = true;
         return $this;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public function saveFile($force = false) {
-        if($this->_deleted === true) {
-            throw CacheException::fileDeleted($this->_fileName);
-        }
-        if($force !== true && $this->_updated === false) { //not changed...
-            return $this;
-        }
-
-        if(\file_exists($this->_filePath) &&
-                \filemtime($this->_filePath) > $this->_lastUpdate) {
-            throw CacheException::fileOutdated($this->_filePath);
-        }
-        
-        $contents = \serialize($this->_data);
-        $return = \file_put_contents($this->_filePath, $contents);
-        if($return === false) {
-            throw CacheException::fileUnwritable($this->_filePath);
-        }
-        $this->_updated = false;
+        //nothing to do here
         return $this;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -309,21 +218,12 @@ class Cache implements ICache {
             throw CacheException::fileDeleted($this->_fileName);
         }
 
-        if(\file_exists($this->_filePath) &&
-                \filemtime($this->_filePath) > $this->_lastUpdate) {
-            throw CacheException::fileOutdated($this->_filePath);
-        }
-
         $this->_deleted = true;
         unset($this->_data);
         unset(self::$_openedFiles[$this->_filePath]);
         unset(self::$_lockedFiles[$this->_filePath]);
-        $return = \unlink($this->_filePath);
-        if($return === false) {
-            throw CacheException::fileUndeletable($this->_fileName);
-        }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -331,11 +231,11 @@ class Cache implements ICache {
         if($this->_deleted === true) {
             throw CacheException::fileDeleted($this->_fileName);
         }
-        
+
         self::$_lockedFiles[$this->_filePath] = true;
         return $this;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -343,28 +243,10 @@ class Cache implements ICache {
         if($this->_deleted === true) {
             throw CacheException::fileDeleted($this->_fileName);
         }
-        
+
         if(isset(self::$_lockedFiles[$this->_filePath])) {
             unset(self::$_lockedFiles[$this->_filePath]);
         }
         return $this;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public function getIterator() {
-        return new CacheIterator($this->_data);
-    }
-
-    /**
-     * Checks whether the given data with the given key is valid.
-     *
-     * @param  string  $key The key
-     * @return boolean      true, if the data is valid, otherwise false
-     */
-    private function _isValid($key) {
-        return $this->_data[$key]['expires'] <= 0 ||
-                $this->_data[$key]['expires'] > \time();
     }
 }

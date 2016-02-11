@@ -55,7 +55,7 @@ class CacheException extends GustavException {
     
     /**
      * This method creates an exception if the given class name of the cache
-     * implementation to use doesn't implement ICache interface.
+     * implementation to use does not implement ICache interface.
      *
      * @param  string                       $className The class name
      * @param  \Exception                   $previous  Previous exception
