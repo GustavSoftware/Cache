@@ -354,7 +354,20 @@ class Cache implements ICache {
      * {@inheritDoc}
      */
     public function getIterator() {
-        return new CacheIterator($this->_data);
+        foreach($this->_data as $key => $value) {
+            if($this->_isValid($key)) {
+                yield $key => $value['value'];
+            }
+        }
+    }
+
+    /**
+     * Avoid the cloning of cache files.
+     *
+     * @throws \Gustav\Cache\CacheException Invalid cloning
+     */
+    public function __clone() {
+        throw CacheException::invalidCloning($this->_fileName);
     }
 
     /**

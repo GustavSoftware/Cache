@@ -34,6 +34,7 @@ use \Gustav\Utils\GustavException;
  * 6 - File can't be written.
  * 7 - File can't be deleted.
  * 8 - File can't be modified as its contents are outdated.
+ * 9 - Tried to clone a cache file.
  *
  * @author  Chris Köcher <ckone@fieselschweif.de>
  * @link    http://gustav.fieselschweif.de
@@ -52,6 +53,7 @@ class CacheException extends GustavException {
     const FILE_UNWRITABLE = 6;
     const FILE_UNDELETABLE = 7;
     const FILE_OUTDATED = 8;
+    const INVALID_CLONING = 9;
     
     /**
      * This method creates an exception if the given class name of the cache
@@ -173,5 +175,21 @@ class CacheException extends GustavException {
         $fileName = (string) $fileName;
         return new self("outdated file: {$fileName}",
                 self::FILE_OUTDATED, $previous);
+    }
+
+    /**
+     * This method creates an exception if someone tried to clone a cache file
+     * which is not allowed.
+     *
+     * @param  string                       $fileName The file-name
+     * @param  \Exception                   $previous Previous exception
+     * @return \Gustav\Cache\CacheException           The new exception
+     * @static
+     */
+    public static function invalidCloning($fileName,
+            \Exception $previous = null) {
+        $fileName = (string) $fileName;
+        return new self("cannot clone file: {$fileName}",
+                self::INVALID_CLONING, $previous);
     }
 }

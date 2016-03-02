@@ -130,7 +130,9 @@ class Cache implements ICache {
      * {@inheritDoc}
      */
     public function getIterator() {
-        return new \ArrayIterator($this->_data);
+        foreach($this->_data as $key => $value) {
+            yield $key => $value;
+        }
     }
 
     /**
@@ -248,5 +250,14 @@ class Cache implements ICache {
             unset(self::$_lockedFiles[$this->_filePath]);
         }
         return $this;
+    }
+
+    /**
+     * Avoid the cloning of cache files.
+     *
+     * @throws \Gustav\Cache\CacheException Invalid cloning
+     */
+    public function __clone() {
+        throw CacheException::invalidCloning($this->_fileName);
     }
 }
