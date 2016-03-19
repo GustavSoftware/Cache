@@ -13,6 +13,6 @@
         "gustav/utils": "dev-master"
     },
     "autoload": {
-        "psr-0": { "Gustav\\Cache\\": "libs/" }
+        "psr-4": { "Gustav\\Cache\\": "src/" }
     }
 }
