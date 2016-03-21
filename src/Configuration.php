@@ -54,11 +54,10 @@ class Configuration {
      * ICache interface. Otherwise this method will throw an CacheException.
      *
      * @param  string                       $className The class name
-     * @return \Gustav\Cache\CacheManager              This object
+     * @return \Gustav\Cache\Configuration             This object
      * @throws \Gustav\Cache\CacheException            Invalid implementation
      */
-    public function setImplementation($className) {
-        $className = (string) $className;
+    public function setImplementation(string $className): Configuration {
         if(!Miscellaneous::implementsInterface($className,
                 "\\Gustav\\Cache\\ICache")) {
             throw CacheException::invalidImplementation($className);
@@ -73,7 +72,7 @@ class Configuration {
      *
      * @return string The class name
      */
-    public function getImplementation() {
+    public function getImplementation(): string {
         return $this->_implementation;
     }
     
@@ -81,11 +80,11 @@ class Configuration {
      * Sets the directory where the cache files can be saved. Consider that this
      * path should be absolute.
      *
-     * @param  string                     $dir The directory
-     * @return \Gustav\Cache\CacheManager      This object
+     * @param  string                      $dir The directory
+     * @return \Gustav\Cache\Configuration      This object
      */
-    public function setDirectory($dir) {
-        $this->_dir = (string) $dir;
+    public function setDirectory(string $dir): Configuration {
+        $this->_dir = $dir;
         return $this;
     }
     
@@ -95,7 +94,7 @@ class Configuration {
      *
      * @return string The path where the cache files can be saved
      */
-    public function getDirectory() {
+    public function getDirectory(): string {
         return $this->_dir;
     }
 }

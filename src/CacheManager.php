@@ -50,7 +50,7 @@ class CacheManager {
      * 
      * @return \Gustav\Cache\Configuration The configuration
      */
-    public function getConfiguration() {
+    public function getConfiguration(): Configuration {
         return $this->_config;
     }
     
@@ -63,7 +63,7 @@ class CacheManager {
      * @return \Gustav\Cache\ICache           The cache-file
      * @static
      */
-    public function getCache($fileName, callable $creator = null) {
+    public function getCache(string $fileName, callable $creator = null): ICache {
         $impl = $this->_config->getImplementation();
         return $impl::openFile($fileName, $this->_config, $creator);
     }
