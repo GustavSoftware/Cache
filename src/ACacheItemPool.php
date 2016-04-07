@@ -81,17 +81,17 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
             return new CacheItem(
                 $key,
                 $this->_data[$key]['value'],
-                $this->_data[$key]['expires'],
                 true,
-                $this
+                $this,
+                $this->_data[$key]['expires']
             );
         } else { //missed the item
             return new CacheItem(
                 $key,
                 null,
-                $this->getDefaultExpiration(),
                 false,
-                $this
+                $this,
+                $this->getDefaultExpiration()
             );
         }
     }

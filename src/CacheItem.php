@@ -72,19 +72,19 @@ class CacheItem implements CacheItemInterface
      *   The key of this cache item
      * @param mixed $value
      *   The value of this cache item
-     * @param \DateTimeInterface|null $expiration
-     *   The time of expiration of this item
      * @param boolean $hit
      *   true, if this was a cache hit, otherwise false (i.e. cache miss)
      * @param \Gustav\Cache\ACacheItemPool $pool
      *   The owning cache item pool
+     * @param \DateTimeInterface|null $expiration
+     *   The time of expiration of this item
      */
     public function __construct(
         string $key,
         $value,
-        \DateTimeInterface $expiration,
         bool $hit,
-        ACacheItemPool $pool
+        ACacheItemPool $pool,
+        \DateTimeInterface $expiration = null
     ) {
         $this->_key = $key;
         $this->_expiration = $expiration;
