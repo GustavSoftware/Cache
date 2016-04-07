@@ -63,7 +63,7 @@ class CacheManager extends ACacheManager
         //create a new file
         $data = [];
         if($creator !== null) {
-            $data = \call_user_func($creator);
+            $data = $this->_createData($creator);
         }
         $this->_pools[$fileName] = new CacheItemPool(
             $data,

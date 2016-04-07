@@ -74,7 +74,7 @@ class CacheManager extends ACacheManager
             $contents = \file_get_contents($filePath);
             if($contents === false) {
                 if($creator !== null) { //try to generate the data automatically
-                    $data = \call_user_func($creator);
+                    $data = $this->_createData($creator);
                     ErrorHandler::setWarning("cannot read cache file"); //TODO: update this one to PSR-3!!!
                 } else {
                     throw CacheException::fileUnreadable($fileName);
@@ -94,7 +94,7 @@ class CacheManager extends ACacheManager
 
         //create a new file
         if($creator !== null) {
-            $data = \call_user_func($creator);
+            $data = $this->_createData($creator);
         }
         $this->_pools[$fileName] = new CacheItemPool(
             $filePath,

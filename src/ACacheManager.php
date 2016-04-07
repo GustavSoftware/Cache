@@ -72,6 +72,28 @@ abstract class ACacheManager
     {
         return $this->_configuration;
     }
+    
+    /**
+     * Calls the creator function of the items of new cache pools and transforms
+     * it into our internal used structure.
+     * 
+     * @param callable $func
+     *   The creator function
+     * @return array
+     *   The data
+     */
+    protected function _createData(callable $func): array
+    {
+        $data = (array) \call_user_func($func);
+        $return = [];
+        foreach($data as $key => $value) {
+            $return[$key] = [
+                'value' => $value,
+                'expires' => 0
+            ];
+        }
+        return $return;
+    }
 
     /**
      * Loads and returns the cache item pool with the given name. If this pool
