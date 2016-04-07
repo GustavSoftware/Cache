@@ -20,7 +20,7 @@
 
 namespace Gustav\Cache;
 
-use Gustav\Utils\Miscellaneous;
+use Gustav\Cache\Filesystem\CacheManager;
 
 /**
  * This class is used for some important configurations of this cache system.
@@ -38,7 +38,7 @@ class Configuration
      *
      * @var string
      */
-    private $_implementation = "\\Gustav\\Cache\\Filesystem\\CacheManager";
+    private $_implementation = CacheManager::class;
     
     /**
      * The absolute path to the directory which contains all the saved cache
@@ -71,10 +71,7 @@ class Configuration
      */
     public function setImplementation(string $className): Configuration 
     {
-        if(!Miscellaneous::implementsInterface(
-            $className,
-            "\\Psr\\Cache\\CacheItemPoolInterface")
-        ) {
+        if(!\is_subclass_of($className, ACacheManager::class)) {
             throw CacheException::invalidImplementation($className);
         }
         $this->_implementation = $className;
