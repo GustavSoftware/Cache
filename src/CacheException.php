@@ -2,7 +2,7 @@
 
 /*
  * Gustav Cache - A small and simple PHP cache system.
- * Copyright (C) 2014-2016  Gustav Software
+ * Copyright (C) since 2014  Gustav Software
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,8 @@
 
 namespace Gustav\Cache;
 
-use \Gustav\Utils\GustavException;
+use Gustav\Utils\GustavException;
+use Psr\Cache\CacheException as ICacheException;
 
 /**
  * This is an exception that occurs while operating on cache-files.
@@ -28,168 +29,83 @@ use \Gustav\Utils\GustavException;
  * Possible error codes are:
  * 1 - The given class name of the cache implementation was invalid.
  * 2 - The file-name contains invalid symbols.
- * 3 - Tried to access a locked file.
- * 4 - Tried to access a deleted file.
- * 5 - File can't be read.
- * 6 - File can't be written.
- * 7 - File can't be deleted.
- * 8 - File can't be modified as its contents are outdated.
- * 9 - Tried to clone a cache file.
+ * 3 - File can't be read.
  *
- * @author  Chris Köcher <ckone@fieselschweif.de>
- * @link    http://gustav.fieselschweif.de
- * @package Gustav.Cache
- * @since   1.0
+ * @author Chris Köcher <ckone@fieselschweif.de>
+ * @link   http://gustav.fieselschweif.de
+ * @since  1.0
  */
-class CacheException extends GustavException {
+class CacheException extends GustavException implements ICacheException
+{
     /**
      * The possible error codes.
      */
     const INVALID_IMPLEMENTATION = 1;
     const BAD_FILE_NAME = 2;
-    const FILE_LOCKED = 3;
-    const FILE_DELETED = 4;
-    const FILE_UNREADABLE = 5;
-    const FILE_UNWRITABLE = 6;
-    const FILE_UNDELETABLE = 7;
-    const FILE_OUTDATED = 8;
-    const INVALID_CLONING = 9;
+    const FILE_UNREADABLE = 3;
     
     /**
      * This method creates an exception if the given class name of the cache
-     * implementation to use does not implement ICache interface.
+     * implementation to use does not implement \Gustav\Cache\ACacheManager.
      *
-     * @param  string                       $className The class name
-     * @param  \Exception                   $previous  Previous exception
-     * @return \Gustav\Cache\CacheException            The new exception
-     * @static
+     * @param string $className
+     *   The class name
+     * @param \Exception|null $previous
+     *   Previous exception
+     * @return \Gustav\Cache\CacheException
+     *   The new exception
      */
-    public static function invalidImplementation($className,
-            \Exception $previous = null) {
-        $className = (string) $className;
-        return new self("invalid class name: {$className}",
-                self::INVALID_IMPLEMENTATION, $previous);
+    public static function invalidImplementation(
+        string $className,
+        \Exception $previous = null
+    ): self {
+        return new self(
+            "invalid class name: {$className}",
+            self::INVALID_IMPLEMENTATION,
+            $previous
+        );
     }
     
     /**
      * This method creates an exception if the given file-name contains
      * invalid symbols.
      *
-     * @param  string                       $fileName The file-name
-     * @param  \Exception                   $previous Previous exception
-     * @return \Gustav\Cache\CacheException           The new exception
-     * @static
+     * @param string $fileName
+     *   The file-name
+     * @param \Exception|null $previous
+     *   Previous exception
+     * @return \Gustav\Cache\CacheException
+     *   The new exception
      */
-    public static function badFileName($fileName, \Exception $previous = null) {
-        $fileName = (string) $fileName;
-        return new self("bad file name: {$fileName}", self::BAD_FILE_NAME,
-                $previous);
-    }
-    
-    /**
-     * This method creates an exception if someone tried to access a locked
-     * file.
-     *
-     * @param  string                       $fileName The file-name
-     * @param  \Exception                   $previous Previous exception
-     * @return \Gustav\Cache\CacheException           The new exception
-     * @static
-     */
-    public static function fileLocked($fileName, \Exception $previous = null) {
-        $fileName = (string) $fileName;
-        return new self("file locked: {$fileName}", self::FILE_LOCKED,
-                $previous);
-    }
-    
-    /**
-     * This method creates an exception if someone tried to access a deleted
-     * file.
-     *
-     * @param  string                       $fileName The file-name
-     * @param  \Exception                   $previous Previous exception
-     * @return \Gustav\Cache\CacheException           The new exception
-     * @static
-     */
-    public static function fileDeleted($fileName, \Exception $previous = null) {
-        $fileName = (string) $fileName;
-        return new self("file already deleted: {$fileName}", self::FILE_DELETED,
-                $previous);
+    public static function badFileName(
+        string $fileName, 
+        \Exception $previous = null
+    ): self {
+        return new self(
+            "bad file name: {$fileName}",
+            self::BAD_FILE_NAME,
+            $previous
+        );
     }
     
     /**
      * This method creates an exception if reading of this file failed.
      *
-     * @param  string                       $fileName The file-name
-     * @param  \Exception                   $previous Previous exception
-     * @return \Gustav\Cache\CacheException           The new exception
-     * @static
+     * @param string $fileName
+     *   The file-name
+     * @param \Exception|null $previous
+     *   Previous exception
+     * @return \Gustav\Cache\CacheException
+     *   The new exception
      */
-    public static function fileUnreadable($fileName,
-            \Exception $previous = null) {
-        $fileName = (string) $fileName;
-        return new self("cannot read file: {$fileName}", self::FILE_UNREADABLE,
-                $previous);
-    }
-    
-    /**
-     * This method creates an exception if writing of this file failed.
-     *
-     * @param  string                       $fileName The file-name
-     * @param  \Exception                   $previous Previous exception
-     * @return \Gustav\Cache\CacheException           The new exception
-     * @static
-     */
-    public static function fileUnwritable($fileName,
-            \Exception $previous = null) {
-        $fileName = (string) $fileName;
-        return new self("cannot write file: {$fileName}", self::FILE_UNWRITABLE,
-                $previous);
-    }
-    
-    /**
-     * This method creates an exception if deleting of this file failed.
-     *
-     * @param  string                       $fileName The file-name
-     * @param  \Exception                   $previous Previous exception
-     * @return \Gustav\Cache\CacheException           The new exception
-     * @static
-     */
-    public static function fileUndeletable($fileName,
-            \Exception $previous = null) {
-        $fileName = (string) $fileName;
-        return new self("cannot delete file: {$fileName}",
-                self::FILE_UNDELETABLE, $previous);
-    }
-
-    /**
-     * This method creates an exception if modification of this file is not
-     * possible anymore as its contents are outdated.
-     *
-     * @param  string                       $fileName The file-name
-     * @param  \Exception                   $previous Previous exception
-     * @return \Gustav\Cache\CacheException           The new exception
-     * @static
-     */
-    public static function fileOutdated($fileName,
-            \Exception $previous = null) {
-        $fileName = (string) $fileName;
-        return new self("outdated file: {$fileName}",
-                self::FILE_OUTDATED, $previous);
-    }
-
-    /**
-     * This method creates an exception if someone tried to clone a cache file
-     * which is not allowed.
-     *
-     * @param  string                       $fileName The file-name
-     * @param  \Exception                   $previous Previous exception
-     * @return \Gustav\Cache\CacheException           The new exception
-     * @static
-     */
-    public static function invalidCloning($fileName,
-            \Exception $previous = null) {
-        $fileName = (string) $fileName;
-        return new self("cannot clone file: {$fileName}",
-                self::INVALID_CLONING, $previous);
+    public static function fileUnreadable(
+        $fileName, 
+        \Exception $previous = null
+    ): self {
+        return new self(
+            "cannot read file: {$fileName}",
+            self::FILE_UNREADABLE,
+            $previous
+        );
     }
 }

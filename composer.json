@@ -2,7 +2,7 @@
     "name": "gustav/cache",
     "type": "library",
     "description": "A small and simple PHP cache system",
-    "keywords": ["cache"],
+    "keywords": ["cache", "psr-6"],
     "homepage": "http://gustav.fieselschweif.de",
     "license": "GPLv3",
     "authors": [
@@ -10,7 +10,8 @@
     ],
     "require": {
         "php": "~7.0",
-        "gustav/utils": "dev-master"
+        "gustav/utils": "dev-master",
+        "psr/cache": "1.0.0"
     },
     "autoload": {
         "psr-4": { "Gustav\\Cache\\": "src/" }
