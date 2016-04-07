@@ -85,14 +85,14 @@ abstract class ACacheManager
     protected function _createData(callable $func): array
     {
         $data = \call_user_func($func);
-        if(!$data instanceof \Traversable) { //ignore invalid results
-            return [];
+        if(!\is_array($data) && !$data instanceof \Traversable) {
+            return []; //ignore invalid results
         }
         $return = [];
         foreach($data as $key => $value) {
             $return[$key] = [
                 'value' => $value,
-                'expires' => 0
+                'expires' => null
             ];
         }
         return $return;
