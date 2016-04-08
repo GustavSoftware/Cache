@@ -18,22 +18,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Gustav\Cache\Tests\Filesystem;
+namespace Gustav\Cache\Tests\Debug;
 
 use Gustav\Cache\ACacheManager;
 use Gustav\Cache\Configuration;
-use Gustav\Cache\Filesystem\CacheManager;
-use Gustav\Cache\Tests\ACacheItemPoolTest;
+use Gustav\Cache\Debug\CacheItemPool;
+use Gustav\Cache\Debug\CacheManager;
+use Gustav\Cache\Tests\ACacheManagerTest;
 
 /**
- * This class is used for testing the functionality of filesystem cache item
- * pools.
+ * This class is used for testing the debugger cache manager.
  *
  * @author Chris Köcher <ckone@fieselschweif.de>
  * @link   http://gustav.fieselschweif.de
  * @since  1.0
  */
-class CacheItemPoolTest extends ACacheItemPoolTest
+class CacheManagerTest extends ACacheManagerTest
 {
     /**
      * @inheritdoc
@@ -41,18 +41,20 @@ class CacheItemPoolTest extends ACacheItemPoolTest
     protected function _initialize()
     {
         $this->_configuration = new Configuration();
-        $this->_configuration->setImplementation(CacheManager::class)
-            ->setDirectory(\dirname(\dirname(__DIR__)) . "/data/");
-        return ACacheManager::getInstance($this->_configuration);
+        $this->_configuration->setImplementation(CacheManager::class);
     }
 
     /**
-     * @inheritdoc
+     * Tests the return types of the methods.
+     *
+     * @test
      */
-    public function tearDown()
+    public function testReturnTypes()
     {
-        if(\file_exists($this->_configuration->getDirectory() . "test")) {
-            \unlink($this->_configuration->getDirectory() . "test");
-        }
+        $manager = ACacheManager::getInstance($this->_configuration);
+        $this->assertTrue($manager instanceof CacheManager);
+
+        $pool1 = $manager->getItemPool("test");
+        $this->assertTrue($pool1 instanceof CacheItemPool);
     }
 }

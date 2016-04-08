@@ -18,15 +18,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Gustav\Cache\Tests\Filesystem;
+namespace Gustav\Cache\Tests\Debug;
 
 use Gustav\Cache\ACacheManager;
 use Gustav\Cache\Configuration;
-use Gustav\Cache\Filesystem\CacheManager;
+use Gustav\Cache\Debug\CacheManager;
 use Gustav\Cache\Tests\ACacheItemPoolTest;
 
 /**
- * This class is used for testing the functionality of filesystem cache item
+ * This class is used for testing the functionality of debugger cache item
  * pools.
  *
  * @author Chris Köcher <ckone@fieselschweif.de>
@@ -41,18 +41,7 @@ class CacheItemPoolTest extends ACacheItemPoolTest
     protected function _initialize()
     {
         $this->_configuration = new Configuration();
-        $this->_configuration->setImplementation(CacheManager::class)
-            ->setDirectory(\dirname(\dirname(__DIR__)) . "/data/");
+        $this->_configuration->setImplementation(CacheManager::class);
         return ACacheManager::getInstance($this->_configuration);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function tearDown()
-    {
-        if(\file_exists($this->_configuration->getDirectory() . "test")) {
-            \unlink($this->_configuration->getDirectory() . "test");
-        }
     }
 }

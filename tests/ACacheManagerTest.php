@@ -18,34 +18,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Gustav\Cache\Tests\Filesystem;
+namespace Gustav\Cache\Tests;
 
 use Gustav\Cache\ACacheManager;
-use Gustav\Cache\Configuration;
-use Gustav\Cache\Filesystem\CacheItemPool;
-use Gustav\Cache\Filesystem\CacheManager;
-use Gustav\Cache\Tests\ACacheManagerTest;
 
 /**
- * This class is used for testing the cache manager with cache pools on file
- * system.
+ * This is a common interface for testing cache managers.
  *
  * @author Chris Köcher <ckone@fieselschweif.de>
  * @link   http://gustav.fieselschweif.de
  * @since  1.0
  */
-class CacheManagerTest extends ACacheManagerTest
+abstract class ACacheManagerTest extends ATestCase
 {
+    /**
+     * The configuration data to use here.
+     *
+     * @var \Gustav\Cache\Configuration
+     */
+    protected $_configuration;
+
     /**
      * @inheritdoc
      */
-    protected function _initialize()
+    public function setUp()
     {
-        $this->_configuration = new Configuration();
-        $this->_configuration->setImplementation(CacheManager::class)
-            ->setDirectory(\dirname(\dirname(__DIR__)) . "/data/");
+        $this->_initialize();
     }
-    
+
     /**
      * @inheritdoc
      */
@@ -57,25 +57,40 @@ class CacheManagerTest extends ACacheManagerTest
     }
 
     /**
-     * Tests the return types of the methods.
+     * Tests the opening of a cache pool.
      *
      * @test
      */
-    public function testReturnTypes()
+    public function testOpening()
     {
         $manager = ACacheManager::getInstance($this->_configuration);
-        $this->assertTrue($manager instanceof CacheManager);
 
         $pool1 = $manager->getItemPool("test");
-        $this->assertTrue($pool1 instanceof CacheItemPool);
+        $pool2 = $manager->getItemPool("test");
+        $this->assertTrue($pool1 === $pool2);
     }
 
     /**
-     * @inheritdoc
+     * Tests the opening of a new cache pool with a creator.
+     *
+     * @test
      */
     public function testCreator()
     {
-        parent::testCreator();
-        $this->assertFileExists($this->_configuration->getDirectory() . "test");
+        $manager = ACacheManager::getInstance($this->_configuration);
+
+        $func = function() {
+            return [
+                'foo' => "bar"
+            ];
+        };
+
+        $pool = $manager->getItemPool("test", $func);
+        $this->assertTrue($pool->hasItem("foo"));
     }
+
+    /**
+     * Initializes the configuration.
+     */
+    abstract protected function _initialize();
 }
