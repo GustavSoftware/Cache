@@ -153,7 +153,7 @@ abstract class ACacheItemPoolTest extends ATestCase
         $this->assertTrue($this->_pool->save($item));
         
         $item2 = $this->_pool->getItem("foo");
-        $this->assertTrue($item2->isHit());\print_r($item2);
+        $this->assertTrue($item2->isHit());
         $this->assertEquals("bar", $item2->get());
     }
     

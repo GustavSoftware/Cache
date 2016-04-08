@@ -46,7 +46,7 @@ class Configuration
      *
      * @var string
      */
-    private $_dir;
+    private $_dir = "";
     
     /**
      * The default time to live of a single cache item in seconds. If this
