@@ -77,7 +77,15 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
     public function getItem($key)
     {
         $key = $this->_validateKey($key);
-        if(isset($this->_data[$key])) {
+        if(isset($this->_deferred[$key])) {
+            return new CacheItem(
+                $key,
+                $this->_deferred[$key]->get(),
+                true,
+                $this,
+                $this->_deferred[$key]->getExpiration()
+            );
+        } elseif(isset($this->_data[$key])) {
             return new CacheItem(
                 $key,
                 $this->_data[$key]['value'],

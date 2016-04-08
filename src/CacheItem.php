@@ -88,7 +88,7 @@ class CacheItem implements CacheItemInterface
     ) {
         $this->_key = $key;
         $this->_expiration = $expiration;
-        if($this->_isExpired()) {
+        if(!$hit || $this->_isExpired()) {
             $this->_value = null;
             $this->_hit = false;
         } else {
@@ -122,7 +122,8 @@ class CacheItem implements CacheItemInterface
      */
     public function isHit()
     {
-        return $this->_hit && !$this->_isExpired();
+        $this->_hit = $this->_hit && !$this->_isExpired();
+        return $this->_hit;
     }
     
     /**
