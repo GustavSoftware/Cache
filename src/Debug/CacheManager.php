@@ -20,9 +20,9 @@
 
 namespace Gustav\Cache\Debug;
 
-use Gustav\Cache\ACacheItemPool;
 use Gustav\Cache\ACacheManager;
 use Gustav\Cache\CacheException;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * The manager of cache item pools that are saved in memory, i.e. the saved data
@@ -47,7 +47,7 @@ class CacheManager extends ACacheManager
     public function getItemPool(
         string $fileName,
         callable $creator = null
-    ): ACacheItemPool {
+    ): CacheItemPoolInterface {
         //already opened?
         if(isset($this->_pools[$fileName])) {
             return $this->_pools[$fileName];

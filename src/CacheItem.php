@@ -111,10 +111,7 @@ class CacheItem implements CacheItemInterface
      */
     public function get()
     {
-        if($this->isHit()) {
-            return $this->_value;
-        }
-        return null;
+        return $this->_value;
     }
     
     /**

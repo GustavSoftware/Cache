@@ -20,6 +20,8 @@
 
 namespace Gustav\Cache;
 
+use Psr\Cache\CacheItemPoolInterface;
+
 /**
  * This is a common interface for management of all the cache item pools.
  *
@@ -107,7 +109,7 @@ abstract class ACacheManager
      * @param callable|null $creator
      *   An additional operation for creation of the cache file if it does not
      *   exist, yet
-     * @return \Gustav\Cache\ACacheItemPool
+     * @return \Psr\Cache\CacheItemPoolInterface
      *   The cache item pool
      * @throws \Gustav\Cache\CacheException
      *   File not readable or bad file name
@@ -115,5 +117,5 @@ abstract class ACacheManager
     abstract public function getItemPool(
         string $fileName,
         callable $creator = null
-    ): ACacheItemPool;
+    ): CacheItemPoolInterface;
 }
