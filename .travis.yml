@@ -1,0 +1,16 @@
+language: php
+
+sudo: false
+
+cache:
+  directories:
+    - vendor
+    - $HOME/.composer/cache
+
+php:
+  - 7.0
+
+install:
+  - travis_retry composer install
+
+script: ./vendor/bin/phpunit --configuration tests/travis/phpunit.xml
