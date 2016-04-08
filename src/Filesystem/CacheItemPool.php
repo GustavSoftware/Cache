@@ -50,8 +50,6 @@ class CacheItemPool extends ACacheItemPool
     /**
      * Constructor of this class.
      *
-     * @param string $fileName
-     *   The file name of this cache item pool
      * @param string $filePath
      *   The full path to the cache item pool's file
      * @param integer $lastUpdate
@@ -73,10 +71,7 @@ class CacheItemPool extends ACacheItemPool
     }
     
     /**
-     * Saves this cache pool on file system.
-     * 
-     * @return boolean
-     *   true, if saving was successful, otherwise false
+     * @inheritdoc
      */
     protected function _persist(): bool {
         if(
@@ -92,5 +87,19 @@ class CacheItemPool extends ACacheItemPool
             return true;
         }
         return false;
+    }
+    
+    /**
+     * Checks whether the file is empty and deletes it in this case.
+     */
+    public function __destruct()
+    {
+        if(
+            empty($this->_data) &&
+            \file_exists($this->_filePath) &&
+            \filemtime($this->_filePath) <= $this->_lastUpdate
+        ) {
+            \unlink($this->_filePath);
+        }
     }
 }
