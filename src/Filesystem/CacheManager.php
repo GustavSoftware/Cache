@@ -22,7 +22,7 @@ namespace Gustav\Cache\Filesystem;
 
 use Gustav\Cache\ACacheManager;
 use Gustav\Cache\CacheException;
-use Gustav\Utils\ErrorHandler;
+use Gustav\Utils\Log\LogManager;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
@@ -75,7 +75,13 @@ class CacheManager extends ACacheManager
             if($contents === false) {
                 if($creator !== null) { //try to generate the data automatically
                     $data = $this->_createData($creator);
-                    ErrorHandler::setWarning("cannot read cache file"); //TODO: update this one to PSR-3!!!
+                    
+                    //log a warning here
+                    LogManager::getLogger(
+                        $this->_configuration->getLogConfiguration()
+                    )->warning("cannot read cache file \"{file}\"", [
+                        'file' => $filePath
+                    ]);
                 } else {
                     throw CacheException::fileUnreadable($fileName);
                 }

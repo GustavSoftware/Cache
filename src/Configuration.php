@@ -21,6 +21,7 @@
 namespace Gustav\Cache;
 
 use Gustav\Cache\Filesystem\CacheManager;
+use Gustav\Utils\Log\Configuration as LogConfiguration;
 
 /**
  * This class is used for some important configurations of this cache system.
@@ -55,7 +56,22 @@ class Configuration
      * @var integer
      */
     private $_defaultExpiration = 0;
-    
+
+    /**
+     * The configuration data of the logger to use here.
+     *
+     * @var \Gustav\Utils\Log\Configuration
+     */
+    private $_logConfiguration;
+
+    /**
+     * Constructor of this class.
+     */
+    public function __construct()
+    {
+        $this->_logConfiguration = new LogConfiguration("cache");
+    }
+
     /**
      * Sets the class name of the implementation of the cache manager that
      * should be used on runtime. Consider that this class name has to extent
@@ -145,5 +161,30 @@ class Configuration
     public function getDefaultExpiration(): int 
     {
         return $this->_defaultExpiration;
+    }
+
+    /**
+     * Sets the configuration of the logger to use here.
+     *
+     * @param \Gustav\Utils\Log\Configuration $configuration
+     *   The new configuration data
+     * @return \Gustav\Cache\Configuration
+     *   This object
+     */
+    public function setLogConfiguration(LogConfiguration $configuration): self
+    {
+        $this->_logConfiguration = $configuration;
+        return $this;
+    }
+
+    /**
+     * Returns the configuration of the logger to use here.
+     *
+     * @return \Gustav\Utils\Log\Configuration
+     *   The logger's configuration
+     */
+    public function getLogConfiguration(): LogConfiguration
+    {
+        return $this->_logConfiguration;
     }
 }

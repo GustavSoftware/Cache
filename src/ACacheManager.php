@@ -20,6 +20,7 @@
 
 namespace Gustav\Cache;
 
+use Gustav\Utils\Log\LogManager;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
