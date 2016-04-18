@@ -21,6 +21,7 @@
 namespace Gustav\Cache\Tests;
 
 use Gustav\Cache\ACacheManager;
+use Gustav\Cache\CacheException;
 
 /**
  * This is a common interface for testing cache managers.
@@ -68,6 +69,20 @@ abstract class ACacheManagerTest extends ATestCase
         $pool1 = $manager->getItemPool("test");
         $pool2 = $manager->getItemPool("test");
         $this->assertTrue($pool1 === $pool2);
+    }
+
+    /**
+     * Tests throwing of exceptions on invalid cache item pool's name.
+     *
+     * @test
+     */
+    public final function testBadFileName()
+    {
+        $manager = ACacheManager::getInstance($this->_configuration);
+        $this->expectException(CacheException::class);
+        $this->expectExceptionCode(CacheException::BAD_FILE_NAME);
+
+        $manager->getItemPool("../invalidName");
     }
 
     /**
