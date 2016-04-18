@@ -36,5 +36,5 @@ Configuration
 You can set the following configurations in `\Gustav\Orm\Configuration`:
 - `setImplementation(string)`: Sets the implementation of the cache manager to use here. Default is `\Gustav\Cache\Filesystem\CacheManager` (i.e. the Filesystem cache).
 - `setDirectory(string)`: Sets the directory on filesystem, where we save the cache pool files. There's no default value.
-- `setDefaultExpiration(integer)`: Sets the default time to live of cache items, if you don't set any explicitly in `\Gustav\Cache\CacheItem`. Consider that `0` and lower means, that the items will not expire. Default ist `0`.
-- `getLogConiguration(): \Gustav\Utils\Log\Configuration` / `setLogConfiguration(\Gustav\Utils\Log\Configuration)`: Configure the error log to use in this cache implementation (see: [Gustav Utils](https://github.com/GustavSoftware/Utils))
+- `setDefaultExpiration(integer)`: Sets the default time to live of cache items, if you don't set any explicitly in `\Gustav\Cache\CacheItem`. Consider that `0` and lower means, that the items will not expire. Default is `0`.
+- `getLogConiguration(): \Gustav\Utils\Log\Configuration` / `setLogConfiguration(\Gustav\Utils\Log\Configuration)`: Configure the error log to use in this cache implementation. By default this uses the default configuration from Utils. See [Gustav Utils](https://github.com/GustavSoftware/Utils) for further information.
