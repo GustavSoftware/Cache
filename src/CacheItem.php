@@ -1,7 +1,6 @@
 <?php
-
-/*
- * Gustav ORM - A simple PHP framework for object-relational mappings.
+/**
+ * Gustav Cache - A small and simple PHP cache system.
  * Copyright (C) since 2014  Gustav Software
  *
  * This program is free software: you can redistribute it and/or modify

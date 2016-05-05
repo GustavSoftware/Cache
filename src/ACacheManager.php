@@ -1,6 +1,5 @@
 <?php
-
-/*
+/**
  * Gustav Cache - A small and simple PHP cache system.
  * Copyright (C) since 2014  Gustav Software
  *
@@ -20,7 +19,6 @@
 
 namespace Gustav\Cache;
 
-use Gustav\Utils\Log\LogManager;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
