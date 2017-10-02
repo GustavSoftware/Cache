@@ -237,7 +237,7 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
      *
      * @param mixed $key
      * @return string
-     * @throws \Gustav\Cache\InvalidArgumentException
+     * @throws \Gustav\Cache\InvalidKeyException
      */
     private function _validateKey($key): string 
     {
@@ -246,7 +246,7 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
             !\is_object($key) &&
             !\method_exists($key, "__toString")
         ) {
-            throw InvalidArgumentException::invalidKey();
+            throw InvalidKeyException::invalidKey();
         }
         return (string) $key;
     }

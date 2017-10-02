@@ -9,7 +9,7 @@
         {"name": "Chris Köcher", "email": "ckone@fieselschweif.de"}
     ],
     "require": {
-        "php": "~7.0",
+        "php": "~7.1",
         "gustav/utils": "dev-master",
         "psr/cache": "1.0.0"
     },

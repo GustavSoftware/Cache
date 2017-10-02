@@ -19,7 +19,7 @@
 
 namespace Gustav\Cache;
 
-use Gustav\Utils\GustavException;
+use Gustav\Utils\InvalidArgumentException;
 use Psr\Cache\InvalidArgumentException as IInvalidArgumentException;
 
 /**
@@ -33,13 +33,13 @@ use Psr\Cache\InvalidArgumentException as IInvalidArgumentException;
  * @link   http://gustav.fieselschweif.de
  * @since  1.0
  */
-class InvalidArgumentException extends GustavException implements
+class InvalidKeyException extends InvalidArgumentException implements
     IInvalidArgumentException
 {
     /**
      * The possible error codes.
      */
-    const INVALID_KEY = 1;
+    const INVALID_KEY = 2;
     
     /**
      * This method creates an exception if a key with an invalid data type was
@@ -47,7 +47,7 @@ class InvalidArgumentException extends GustavException implements
      *
      * @param \Exception|null $previous
      *   Previous exception
-     * @return \Gustav\Cache\InvalidArgumentException
+     * @return \Gustav\Cache\InvalidKeyException
      *   The new exception
      */
     public static function invalidKey(\Exception $previous = null): self
