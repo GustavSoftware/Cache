@@ -19,6 +19,8 @@
 
 namespace Gustav\Cache\Tests;
 
+use Gustav\Cache\ACacheManager;
+
 /**
  * This is a common interface for testing cache item pools and cache items.
  *
@@ -45,7 +47,7 @@ abstract class ACacheItemPoolTest extends ATestCase
     /**
      * @inheritdoc
      */
-    public function setUp()
+    public function setUp(): void
     {
         $manager = $this->_initialize();
 
@@ -62,7 +64,7 @@ abstract class ACacheItemPoolTest extends ATestCase
      *
      * @test
      */
-    public function testGetItem()
+    public function testGetItem(): void
     {
         $item = $this->_pool->getItem("test1");
         $this->assertTrue($item->isHit());
@@ -74,7 +76,7 @@ abstract class ACacheItemPoolTest extends ATestCase
      *
      * @test
      */
-    public function testGetItems()
+    public function testGetItems(): void
     {
         $keys = ["test1", "test2", "foo"];
         $items = $this->_pool->getItems($keys);
@@ -91,7 +93,7 @@ abstract class ACacheItemPoolTest extends ATestCase
      *
      * @test
      */
-    public function testHasItem()
+    public function testHasItem(): void
     {
         $this->assertTrue($this->_pool->hasItem("test1"));
         $this->assertFalse($this->_pool->hasItem("foo"));
@@ -115,7 +117,7 @@ abstract class ACacheItemPoolTest extends ATestCase
      *
      * @test
      */
-    public function testDeleteItem()
+    public function testDeleteItem(): void
     {
         $this->assertTrue($this->_pool->hasItem("test1"));
         $this->assertTrue($this->_pool->deleteItem("test1"));
@@ -126,7 +128,7 @@ abstract class ACacheItemPoolTest extends ATestCase
     /**
      * Tests the deletion of multiple cache items.
      */
-    public function testDeleteItems()
+    public function testDeleteItems(): void
     {
         $keys = ["test1", "test2", "foo"];
         $this->assertTrue($this->_pool->deleteItems($keys));
@@ -162,7 +164,7 @@ abstract class ACacheItemPoolTest extends ATestCase
      *
      * @test
      */
-    public function testSaveDeferred()
+    public function testSaveDeferred(): void
     {
         $item = $this->_pool->getItem("foo");
         $this->assertFalse($item->isHit());
@@ -180,7 +182,7 @@ abstract class ACacheItemPoolTest extends ATestCase
      * 
      * @test
      */
-    public function testExpiresAt()
+    public function testExpiresAt(): void
     {
         $item = $this->_pool->getItem("test1");
         $this->assertTrue($item->isHit());
@@ -198,7 +200,7 @@ abstract class ACacheItemPoolTest extends ATestCase
      *
      * @test
      */
-    public function testExpiresAfter()
+    public function testExpiresAfter(): void
     {
         $item = $this->_pool->getItem("test1");
         $this->assertTrue($item->isHit());
@@ -217,5 +219,5 @@ abstract class ACacheItemPoolTest extends ATestCase
      * @return \Gustav\Cache\ACacheManager
      *   The cache manager to use here
      */
-    abstract protected function _initialize();
+    abstract protected function _initialize(): ACacheManager;
 }

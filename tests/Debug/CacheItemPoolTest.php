@@ -37,7 +37,7 @@ class CacheItemPoolTest extends ACacheItemPoolTest
     /**
      * @inheritdoc
      */
-    protected function _initialize()
+    protected function _initialize(): ACacheManager
     {
         $this->_configuration = new Configuration();
         $this->_configuration->setImplementation(CacheManager::class);

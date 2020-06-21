@@ -38,7 +38,7 @@ class Configuration
      *
      * @var string
      */
-    private $_implementation = CacheManager::class;
+    private string $_implementation = CacheManager::class;
     
     /**
      * The absolute path to the directory which contains all the saved cache
@@ -46,22 +46,22 @@ class Configuration
      *
      * @var string
      */
-    private $_dir = "";
+    private string $_dir = "";
     
     /**
      * The default time to live of a single cache item in seconds. If this
      * constant is not greater than 0 the cache items should never expire. 
      *
-     * @var integer
+     * @var int
      */
-    private $_defaultExpiration = 0;
+    private int $_defaultExpiration = 0;
 
     /**
      * The configuration data of the logger to use here.
      *
      * @var \Gustav\Utils\Log\Configuration
      */
-    private $_logConfiguration;
+    private \Gustav\Utils\Log\Configuration $_logConfiguration;
 
     /**
      * Constructor of this class.

@@ -38,14 +38,11 @@ class ConfigurationTest extends ATestCase
      *
      * @test
      */
-    public function testFilesystem()
+    public function testFilesystem(): void
     {
         $config = new Configuration();
         $config->setImplementation(FilesystemManager::class);
-        $this->assertEquals(
-            $config->getImplementation(),
-            FilesystemManager::class
-        );
+        $this->assertEquals($config->getImplementation(), FilesystemManager::class);
     }
 
     /**
@@ -53,14 +50,11 @@ class ConfigurationTest extends ATestCase
      *
      * @test
      */
-    public function testDebug()
+    public function testDebug(): void
     {
         $config = new Configuration();
         $config->setImplementation(DebugManager::class);
-        $this->assertEquals(
-            $config->getImplementation(),
-            DebugManager::class
-        );
+        $this->assertEquals($config->getImplementation(), DebugManager::class);
     }
 
     /**
@@ -68,7 +62,7 @@ class ConfigurationTest extends ATestCase
      *
      * @test
      */
-    public function testException()
+    public function testException(): void
     {
         $config = new Configuration();
         $this->expectException(CacheException::class);

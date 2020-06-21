@@ -21,6 +21,7 @@ namespace Gustav\Cache\Tests;
 
 use Gustav\Cache\ACacheManager;
 use Gustav\Cache\CacheException;
+use Gustav\Cache\Configuration;
 
 /**
  * This is a common interface for testing cache managers.
@@ -36,12 +37,12 @@ abstract class ACacheManagerTest extends ATestCase
      *
      * @var \Gustav\Cache\Configuration
      */
-    protected $_configuration;
+    protected Configuration $_configuration;
 
     /**
      * @inheritdoc
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->_initialize();
     }
@@ -49,7 +50,7 @@ abstract class ACacheManagerTest extends ATestCase
     /**
      * @inheritdoc
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         if(\file_exists($this->_configuration->getDirectory() . "test")) {
             \unlink($this->_configuration->getDirectory() . "test");
@@ -61,7 +62,7 @@ abstract class ACacheManagerTest extends ATestCase
      *
      * @test
      */
-    public function testOpening()
+    public function testOpening(): void
     {
         $manager = ACacheManager::getInstance($this->_configuration);
 
@@ -75,7 +76,7 @@ abstract class ACacheManagerTest extends ATestCase
      *
      * @test
      */
-    public final function testBadFileName()
+    public final function testBadFileName(): void
     {
         $manager = ACacheManager::getInstance($this->_configuration);
         $this->expectException(CacheException::class);
@@ -89,7 +90,7 @@ abstract class ACacheManagerTest extends ATestCase
      *
      * @test
      */
-    public function testCreator()
+    public function testCreator(): void
     {
         $manager = ACacheManager::getInstance($this->_configuration);
 
@@ -106,5 +107,5 @@ abstract class ACacheManagerTest extends ATestCase
     /**
      * Initializes the configuration.
      */
-    abstract protected function _initialize();
+    abstract protected function _initialize(): void;
 }

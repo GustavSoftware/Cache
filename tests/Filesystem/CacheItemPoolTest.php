@@ -37,7 +37,7 @@ class CacheItemPoolTest extends ACacheItemPoolTest
     /**
      * @inheritdoc
      */
-    protected function _initialize()
+    protected function _initialize(): ACacheManager
     {
         $this->_configuration = new Configuration();
         $this->_configuration->setImplementation(CacheManager::class)
@@ -48,7 +48,7 @@ class CacheItemPoolTest extends ACacheItemPoolTest
     /**
      * @inheritdoc
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         if(\file_exists($this->_configuration->getDirectory() . "test")) {
             \unlink($this->_configuration->getDirectory() . "test");

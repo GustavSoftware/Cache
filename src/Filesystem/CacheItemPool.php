@@ -36,15 +36,15 @@ class CacheItemPool extends ACacheItemPool
      *
      * @var string
      */
-    private $_filePath;
+    private string $_filePath;
 
     /**
      * The timestamp of the last update of the cache file. This is needed to
      * avoid some problems with concurrency.
      *
-     * @var integer
+     * @var int
      */
-    private $_lastUpdate;
+    private int $_lastUpdate;
 
     /**
      * Constructor of this class.
@@ -58,12 +58,8 @@ class CacheItemPool extends ACacheItemPool
      * @param \Gustav\Cache\Configuration $configuration
      *   Some configurations
      */
-    public function __construct(
-        string $filePath,
-        int $lastUpdate, 
-        array $data,
-        Configuration $configuration
-    ) {
+    public function __construct(string $filePath, int $lastUpdate, array $data, Configuration $configuration)
+    {
         $this->_filePath = $filePath;
         $this->_lastUpdate = $lastUpdate;
         parent::__construct($data, $configuration);
@@ -72,11 +68,9 @@ class CacheItemPool extends ACacheItemPool
     /**
      * @inheritdoc
      */
-    protected function _persist(): bool {
-        if(
-            \file_exists($this->_filePath) &&
-            \filemtime($this->_filePath) > $this->_lastUpdate
-        ) {
+    protected function _persist(): bool
+    {
+        if(\file_exists($this->_filePath) && \filemtime($this->_filePath) > $this->_lastUpdate) {
             return false;
         }
 
@@ -93,11 +87,7 @@ class CacheItemPool extends ACacheItemPool
      */
     public function __destruct()
     {
-        if(
-            empty($this->_data) &&
-            \file_exists($this->_filePath) &&
-            \filemtime($this->_filePath) <= $this->_lastUpdate
-        ) {
+        if(empty($this->_data) && \file_exists($this->_filePath) && \filemtime($this->_filePath) <= $this->_lastUpdate) {
             \unlink($this->_filePath);
         }
     }

@@ -19,6 +19,8 @@
 
 namespace Gustav\Cache\Tests;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * This is a common interface for all of our test cases.
  *
@@ -26,7 +28,7 @@ namespace Gustav\Cache\Tests;
  * @link   http://gustav.fieselschweif.de
  * @since  1.0
  */
-abstract class ATestCase extends \PHPUnit_Framework_TestCase
+abstract class ATestCase extends TestCase
 {
     //nothing to do here!
 }

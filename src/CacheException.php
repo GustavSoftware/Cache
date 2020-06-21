@@ -54,15 +54,9 @@ class CacheException extends GustavException implements ICacheException
      * @return \Gustav\Cache\CacheException
      *   The new exception
      */
-    public static function invalidImplementation(
-        string $className,
-        \Exception $previous = null
-    ): self {
-        return new self(
-            "invalid class name: {$className}",
-            self::INVALID_IMPLEMENTATION,
-            $previous
-        );
+    public static function invalidImplementation(string $className, ?\Exception $previous = null): self
+    {
+        return new self("invalid class name: {$className}", self::INVALID_IMPLEMENTATION, $previous);
     }
     
     /**
@@ -76,15 +70,9 @@ class CacheException extends GustavException implements ICacheException
      * @return \Gustav\Cache\CacheException
      *   The new exception
      */
-    public static function badFileName(
-        string $fileName, 
-        \Exception $previous = null
-    ): self {
-        return new self(
-            "bad file name: {$fileName}",
-            self::BAD_FILE_NAME,
-            $previous
-        );
+    public static function badFileName(string $fileName, ?\Exception $previous = null): self
+    {
+        return new self("bad file name: {$fileName}", self::BAD_FILE_NAME, $previous);
     }
     
     /**
@@ -97,14 +85,8 @@ class CacheException extends GustavException implements ICacheException
      * @return \Gustav\Cache\CacheException
      *   The new exception
      */
-    public static function fileUnreadable(
-        $fileName, 
-        \Exception $previous = null
-    ): self {
-        return new self(
-            "cannot read file: {$fileName}",
-            self::FILE_UNREADABLE,
-            $previous
-        );
+    public static function fileUnreadable(string $fileName, ?\Exception $previous = null): self
+    {
+        return new self("cannot read file: {$fileName}", self::FILE_UNREADABLE, $previous);
     }
 }

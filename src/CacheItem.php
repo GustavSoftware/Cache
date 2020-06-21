@@ -35,7 +35,7 @@ class CacheItem implements CacheItemInterface
      *
      * @var string
      */
-    private $_key;
+    private string $_key;
 
     /**
      * The value of this cache item
@@ -50,19 +50,19 @@ class CacheItem implements CacheItemInterface
      *
      * @var \DateTimeInterface|null
      */
-    private $_expiration;
+    private ?\DateTimeInterface $_expiration;
 
     /**
      * @var boolean
      */
-    private $_hit;
+    private bool $_hit;
 
     /**
      * The owning cache item pool.
      *
      * @var \Gustav\Cache\ACacheItemPool
      */
-    private $_pool;
+    private ACacheItemPool $_pool;
 
     /**
      * Constructor of this class.
@@ -83,7 +83,7 @@ class CacheItem implements CacheItemInterface
         $value,
         bool $hit,
         ACacheItemPool $pool,
-        \DateTimeInterface $expiration = null
+        ?\DateTimeInterface $expiration = null
     ) {
         $this->_key = $key;
         $this->_expiration = $expiration;
@@ -100,7 +100,7 @@ class CacheItem implements CacheItemInterface
     /**
      * @inheritdoc
      */
-    public function getKey()
+    public function getKey(): string
     {
         return $this->_key;
     }
@@ -116,7 +116,7 @@ class CacheItem implements CacheItemInterface
     /**
      * @inheritdoc
      */
-    public function isHit()
+    public function isHit(): bool
     {
         $this->_hit = $this->_hit && !$this->_isExpired();
         return $this->_hit;
@@ -125,7 +125,7 @@ class CacheItem implements CacheItemInterface
     /**
      * @inheritdoc
      */
-    public function set($value)
+    public function set($value): self
     {
         $this->_value = $value;
         return $this;
@@ -134,7 +134,7 @@ class CacheItem implements CacheItemInterface
     /**
      * @inheritdoc
      */
-    public function expiresAt($expiration)
+    public function expiresAt($expiration): self
     {
         if(\is_null($expiration)) {
             $this->_expiration = $this->_pool->getDefaultExpiration();
@@ -148,7 +148,7 @@ class CacheItem implements CacheItemInterface
     /**
      * @inheritdoc
      */
-    public function expiresAfter($time)
+    public function expiresAfter($time): self
     {
         if(\is_null($time)) {
             $this->_expiration = $this->_pool->getDefaultExpiration();
@@ -169,7 +169,7 @@ class CacheItem implements CacheItemInterface
      * @return \DateTimeInterface|null
      *   The time of expiration
      */
-    public function getExpiration()
+    public function getExpiration(): ?\DateTimeInterface
     {
         return $this->_expiration;
     }
@@ -183,9 +183,6 @@ class CacheItem implements CacheItemInterface
      */
     private function _isExpired(): bool
     {
-        return (
-            !\is_null($this->_expiration) &&
-            $this->_expiration <= new \DateTime("now")
-        );
+        return (!\is_null($this->_expiration) && $this->_expiration <= new \DateTime("now"));
     }
 }

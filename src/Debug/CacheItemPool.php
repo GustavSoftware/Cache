@@ -39,10 +39,8 @@ class CacheItemPool extends ACacheItemPool
      * @param \Gustav\Cache\Configuration $configuration
      *   Some configurations
      */
-    public function __construct(
-        array $data,
-        Configuration $configuration
-    ) {
+    public function __construct(array $data, Configuration $configuration)
+    {
         parent::__construct($data, $configuration);
     }
     

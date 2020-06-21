@@ -35,7 +35,7 @@ abstract class ACacheManager
      *
      * @var \Gustav\Cache\Configuration
      */
-    protected $_configuration;
+    protected Configuration $_configuration;
     
     /**
      * Constructor of this class.
@@ -56,9 +56,8 @@ abstract class ACacheManager
      * @return \Gustav\Cache\ACacheManager
      *   The cache manager
      */
-    final public static function getInstance(
-        Configuration $configuration
-    ): ACacheManager {
+    final public static function getInstance(Configuration $configuration): ACacheManager
+    {
         $implementation = $configuration->getImplementation();
         return new $implementation($configuration);
     }
@@ -113,8 +112,5 @@ abstract class ACacheManager
      * @throws \Gustav\Cache\CacheException
      *   File not readable or bad file name
      */
-    abstract public function getItemPool(
-        string $fileName,
-        callable $creator = null
-    ): CacheItemPoolInterface;
+    abstract public function getItemPool(string $fileName, callable $creator = null): CacheItemPoolInterface;
 }

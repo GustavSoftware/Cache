@@ -33,8 +33,7 @@ use Psr\Cache\InvalidArgumentException as IInvalidArgumentException;
  * @link   http://gustav.fieselschweif.de
  * @since  1.0
  */
-class InvalidKeyException extends InvalidArgumentException implements
-    IInvalidArgumentException
+class InvalidKeyException extends InvalidArgumentException implements IInvalidArgumentException
 {
     /**
      * The possible error codes.
@@ -50,12 +49,8 @@ class InvalidKeyException extends InvalidArgumentException implements
      * @return \Gustav\Cache\InvalidKeyException
      *   The new exception
      */
-    public static function invalidKey(\Exception $previous = null): self
+    public static function invalidKey(?\Exception $previous = null): self
     {
-        return new self(
-            "invalid cache item key given",
-            self::INVALID_KEY,
-            $previous
-        );
+        return new self("invalid cache item key given", self::INVALID_KEY, $previous);
     }
 }

@@ -38,7 +38,7 @@ class CacheManagerTest extends ACacheManagerTest
     /**
      * @inheritdoc
      */
-    protected function _initialize()
+    protected function _initialize(): void
     {
         $this->_configuration = new Configuration();
         $this->_configuration->setImplementation(CacheManager::class)
@@ -48,7 +48,7 @@ class CacheManagerTest extends ACacheManagerTest
     /**
      * @inheritdoc
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         if(\file_exists($this->_configuration->getDirectory() . "test")) {
             \unlink($this->_configuration->getDirectory() . "test");
@@ -60,7 +60,7 @@ class CacheManagerTest extends ACacheManagerTest
      *
      * @test
      */
-    public function testReturnTypes()
+    public function testReturnTypes(): void
     {
         $manager = ACacheManager::getInstance($this->_configuration);
         $this->assertTrue($manager instanceof CacheManager);
@@ -72,7 +72,7 @@ class CacheManagerTest extends ACacheManagerTest
     /**
      * @inheritdoc
      */
-    public function testCreator()
+    public function testCreator(): void
     {
         parent::testCreator();
         $this->assertFileExists($this->_configuration->getDirectory() . "test");

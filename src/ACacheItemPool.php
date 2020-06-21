@@ -40,21 +40,21 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
      *
      * @var array
      */
-    protected $_data;
+    protected array $_data;
     
     /**
      * The data to be saved later.
      * 
      * @var \Gustav\Cache\CacheItem[]
      */
-    protected $_deferred = [];
+    protected array $_deferred = [];
     
     /**
      * The configuration of this cache item pool.
      *
      * @var \Gustav\Cache\Configuration
      */
-    protected $_configuration;
+    protected Configuration $_configuration;
     
     /**
      * Constructor of this class.
@@ -73,7 +73,7 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
     /**
      * @inheritdoc
      */
-    public function getItem($key)
+    public function getItem($key): CacheItem
     {
         $key = $this->_validateKey($key);
         if(isset($this->_deferred[$key])) {
@@ -85,21 +85,9 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
                 $this->_deferred[$key]->getExpiration()
             );
         } elseif(isset($this->_data[$key])) {
-            return new CacheItem(
-                $key,
-                $this->_data[$key]['value'],
-                true,
-                $this,
-                $this->_data[$key]['expires']
-            );
+            return new CacheItem($key, $this->_data[$key]['value'], true, $this, $this->_data[$key]['expires']);
         } else { //missed the item
-            return new CacheItem(
-                $key,
-                null,
-                false,
-                $this,
-                $this->getDefaultExpiration()
-            );
+            return new CacheItem($key, null, false, $this, $this->getDefaultExpiration());
         }
     }
     
@@ -116,7 +104,7 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
     /**
      * @inheritdoc
      */
-    public function hasItem($key)
+    public function hasItem($key): bool
     {
         $key = $this->_validateKey($key);
         return isset($this->_data[$key]) && !$this->_isExpired($key);
@@ -125,7 +113,7 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
     /**
      * @inheritdoc
      */
-    public function clear()
+    public function clear(): bool
     {
         $this->_data = array();
         return $this->_persist();
@@ -134,7 +122,7 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
     /**
      * @inheritdoc
      */
-    public function deleteItem($key)
+    public function deleteItem($key): bool
     {
         $key = $this->_validateKey($key);
         if(!isset($this->_data[$key])) {
@@ -147,7 +135,7 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
     /**
      * @inheritdoc
      */
-    public function deleteItems(array $keys)
+    public function deleteItems(array $keys): bool
     {
         foreach($keys as $key) {
             $key = $this->_validateKey($key);
@@ -159,7 +147,7 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
     /**
      * @inheritdoc
      */
-    public function save(CacheItemInterface $item)
+    public function save(CacheItemInterface $item): bool
     {
         if(!$item instanceof CacheItem) {
             return false;
@@ -174,7 +162,7 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
     /**
      * @inheritdoc
      */
-    public function saveDeferred(CacheItemInterface $item)
+    public function saveDeferred(CacheItemInterface $item): bool
     {
         if(!$item instanceof CacheItem) {
             return false;
@@ -186,7 +174,7 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
     /**
      * @inheritdoc
      */
-    public function commit()
+    public function commit(): bool
     {
         $data = $this->_data;
         foreach($this->_deferred as $item) {
@@ -211,7 +199,8 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
      * @return \Gustav\Cache\Configuration
      *   The configuration data
      */
-    public function getConfiguration() {
+    public function getConfiguration(): Configuration
+    {
         return $this->_configuration;
     }
     
@@ -221,14 +210,12 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
      * @return \DateTimeInterface|null
      *   The expiration time
      */
-    public function getDefaultExpiration() {
+    public function getDefaultExpiration(): ?\DateTimeInterface
+    {
         if($this->_configuration->getDefaultExpiration() == 0) {
             return null;
         } else {
-            return new \DateTime(
-                "now + " . $this->_configuration->getDefaultExpiration() .
-                    " seconds"
-            );
+            return new \DateTime("now + " . $this->_configuration->getDefaultExpiration() . " seconds");
         }
     }
     
@@ -241,11 +228,7 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
      */
     private function _validateKey($key): string 
     {
-        if(
-            !\is_scalar($key) &&
-            !\is_object($key) &&
-            !\method_exists($key, "__toString")
-        ) {
+        if(!\is_scalar($key) && !\is_object($key) && !\method_exists($key, "__toString")) {
             throw InvalidKeyException::invalidKey();
         }
         return (string) $key;

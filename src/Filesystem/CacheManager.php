@@ -39,15 +39,12 @@ class CacheManager extends ACacheManager
      *
      * @var \Gustav\Cache\Filesystem\CacheItemPool[]
      */
-    private $_pools = [];
+    private array $_pools = [];
 
     /**
      * @inheritdoc
      */
-    public function getItemPool(
-        string $fileName,
-        callable $creator = null
-    ): CacheItemPoolInterface {
+    public function getItemPool(string $fileName, ?callable $creator = null): CacheItemPoolInterface {
         //already opened?
         if(isset($this->_pools[$fileName])) {
             return $this->_pools[$fileName];
@@ -62,10 +59,7 @@ class CacheManager extends ACacheManager
             \mkdir($this->_configuration->getDirectory());
         }
 
-        if(
-            \mb_strpos($fileName, "..") !== false ||
-            \mb_strpos($fileName, "/") !== false
-        ) {
+        if(\mb_strpos($fileName, "..") !== false || \mb_strpos($fileName, "/") !== false) {
             throw CacheException::badFileName($fileName);
         }
         if(\file_exists($filePath)) {
@@ -76,23 +70,17 @@ class CacheManager extends ACacheManager
                     $data = $this->_createData($creator);
                     
                     //log a warning here
-                    LogManager::getLogger(
-                        $this->_configuration->getLogConfiguration()
-                    )->warning("cannot read cache file \"{file}\"", [
-                        'file' => $filePath
-                    ]);
+                    LogManager::getLogger($this->_configuration->getLogConfiguration())
+                        ->warning("cannot read cache file \"{file}\"", [
+                            'file' => $filePath
+                        ]);
                 } else {
                     throw CacheException::fileUnreadable($fileName);
                 }
             } else {
                 $data = \unserialize($contents);
             }
-            $this->_pools[$fileName] = new CacheItemPool(
-                $filePath,
-                $lastUpdate,
-                $data, 
-                $this->_configuration
-            );
+            $this->_pools[$fileName] = new CacheItemPool($filePath, $lastUpdate, $data, $this->_configuration);
 
             return $this->_pools[$fileName];
         }
@@ -101,12 +89,7 @@ class CacheManager extends ACacheManager
         if($creator !== null) {
             $data = $this->_createData($creator);
         }
-        $this->_pools[$fileName] = new CacheItemPool(
-            $filePath,
-            0,
-            $data,
-            $this->_configuration
-        );
+        $this->_pools[$fileName] = new CacheItemPool($filePath, 0, $data, $this->_configuration);
         if($data) {
             $this->_pools[$fileName]->commit();
         }

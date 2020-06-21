@@ -37,7 +37,7 @@ class CacheManagerTest extends ACacheManagerTest
     /**
      * @inheritdoc
      */
-    protected function _initialize()
+    protected function _initialize(): void
     {
         $this->_configuration = new Configuration();
         $this->_configuration->setImplementation(CacheManager::class);
@@ -48,7 +48,7 @@ class CacheManagerTest extends ACacheManagerTest
      *
      * @test
      */
-    public function testReturnTypes()
+    public function testReturnTypes(): void
     {
         $manager = ACacheManager::getInstance($this->_configuration);
         $this->assertTrue($manager instanceof CacheManager);

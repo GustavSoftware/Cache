@@ -38,24 +38,19 @@ class CacheManager extends ACacheManager
     /**
      * @var \Gustav\Cache\Debug\CacheItemPool[]
      */
-    private $_pools = [];
+    private array $_pools = [];
     
     /**
      * @inheritdoc
      */
-    public function getItemPool(
-        string $fileName,
-        callable $creator = null
-    ): CacheItemPoolInterface {
+    public function getItemPool(string $fileName, callable $creator = null): CacheItemPoolInterface
+    {
         //already opened?
         if(isset($this->_pools[$fileName])) {
             return $this->_pools[$fileName];
         }
     
-        if(
-            \mb_strpos($fileName, "..") !== false ||
-            \mb_strpos($fileName, "/") !== false
-        ) {
+        if(\mb_strpos($fileName, "..") !== false || \mb_strpos($fileName, "/") !== false) {
             throw CacheException::badFileName($fileName);
         }
     
