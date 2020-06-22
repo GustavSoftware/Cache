@@ -20,6 +20,7 @@
 namespace Gustav\Cache;
 
 use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * This class represents single cache items.
@@ -62,7 +63,7 @@ class CacheItem implements CacheItemInterface
      *
      * @var \Gustav\Cache\ACacheItemPool
      */
-    private ACacheItemPool $_pool;
+    private CacheItemPoolInterface $_pool;
 
     /**
      * Constructor of this class.
@@ -73,7 +74,7 @@ class CacheItem implements CacheItemInterface
      *   The value of this cache item
      * @param boolean $hit
      *   true, if this was a cache hit, otherwise false (i.e. cache miss)
-     * @param \Gustav\Cache\ACacheItemPool $pool
+     * @param CacheItemPoolInterface $pool
      *   The owning cache item pool
      * @param \DateTimeInterface|null $expiration
      *   The time of expiration of this item
@@ -82,7 +83,7 @@ class CacheItem implements CacheItemInterface
         string $key,
         $value,
         bool $hit,
-        ACacheItemPool $pool,
+        CacheItemPoolInterface $pool,
         ?\DateTimeInterface $expiration = null
     ) {
         $this->_key = $key;
