@@ -20,6 +20,7 @@
 namespace Gustav\Cache;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Traversable;
 
 /**
  * This is a common interface for management of all the cache item pools.
@@ -84,8 +85,8 @@ abstract class ACacheManager
      */
     protected function _createData(callable $func): array
     {
-        $data = \call_user_func($func);
-        if(!\is_array($data) && !$data instanceof \Traversable) {
+        $data = call_user_func($func);
+        if(!is_array($data) && !$data instanceof Traversable) {
             return []; //ignore invalid results
         }
         $return = [];
@@ -112,5 +113,15 @@ abstract class ACacheManager
      * @throws \Gustav\Cache\CacheException
      *   File not readable or bad file name
      */
-    abstract public function getItemPool(string $fileName, callable $creator = null): CacheItemPoolInterface;
+    abstract public function getItemPool(string $fileName, ?callable $creator = null): CacheItemPoolInterface;
+
+    /**
+     * Indicates whether the cache item pool with the given name was already opened in this session.
+     *
+     * @param string $fileName
+     *   The name of the item pool's file
+     * @return bool
+     *   true, if already open, false otherwise
+     */
+    abstract public function isOpened(string $fileName): bool;
 }

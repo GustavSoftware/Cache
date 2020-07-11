@@ -19,6 +19,7 @@
 
 namespace Gustav\Cache;
 
+use Exception;
 use Gustav\Utils\InvalidArgumentException;
 use Psr\Cache\InvalidArgumentException as IInvalidArgumentException;
 
@@ -33,7 +34,8 @@ use Psr\Cache\InvalidArgumentException as IInvalidArgumentException;
  * @link   http://gustav.fieselschweif.de
  * @since  1.0
  */
-class InvalidKeyException extends InvalidArgumentException implements IInvalidArgumentException
+class InvalidKeyException extends InvalidArgumentException
+    implements IInvalidArgumentException, \Psr\SimpleCache\InvalidArgumentException
 {
     /**
      * The possible error codes.
@@ -44,12 +46,12 @@ class InvalidKeyException extends InvalidArgumentException implements IInvalidAr
      * This method creates an exception if a key with an invalid data type was
      * given to the cache item pool.
      *
-     * @param \Exception|null $previous
+     * @param Exception|null $previous
      *   Previous exception
-     * @return \Gustav\Cache\InvalidKeyException
+     * @return self
      *   The new exception
      */
-    public static function invalidKey(?\Exception $previous = null): self
+    public static function invalidKey(?Exception $previous = null): self
     {
         return new self("invalid cache item key given", self::INVALID_KEY, $previous);
     }

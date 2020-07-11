@@ -37,12 +37,12 @@ class CacheManager extends ACacheManager
     /**
      * The cache item pools that we've loaded in this session, yet.
      *
-     * @var \Gustav\Cache\Filesystem\CacheItemPool[]
+     * @var CacheItemPool[]
      */
     private array $_pools = [];
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getItemPool(string $fileName, ?callable $creator = null): CacheItemPoolInterface {
         //already opened?
@@ -55,16 +55,16 @@ class CacheManager extends ACacheManager
         $data = [];
 
         //try to load from file system
-        if(!\file_exists($this->_configuration->getDirectory())) {
-            \mkdir($this->_configuration->getDirectory());
+        if(!file_exists($this->_configuration->getDirectory())) {
+            mkdir($this->_configuration->getDirectory());
         }
 
-        if(\mb_strpos($fileName, "..") !== false || \mb_strpos($fileName, "/") !== false) {
+        if(mb_strpos($fileName, "..") !== false || mb_strpos($fileName, "/") !== false) {
             throw CacheException::badFileName($fileName);
         }
-        if(\file_exists($filePath)) {
-            $lastUpdate = \filemtime($filePath);
-            $contents = \file_get_contents($filePath);
+        if(file_exists($filePath)) {
+            $lastUpdate = filemtime($filePath);
+            $contents = file_get_contents($filePath);
             if($contents === false) {
                 if($creator !== null) { //try to generate the data automatically
                     $data = $this->_createData($creator);
@@ -78,7 +78,7 @@ class CacheManager extends ACacheManager
                     throw CacheException::fileUnreadable($fileName);
                 }
             } else {
-                $data = \unserialize($contents);
+                $data = unserialize($contents);
             }
             $this->_pools[$fileName] = new CacheItemPool($filePath, $lastUpdate, $data, $this->_configuration);
 
@@ -95,5 +95,13 @@ class CacheManager extends ACacheManager
         }
 
         return $this->_pools[$fileName];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isOpened(string $fileName): bool
+    {
+        return isset($this->_pools[$fileName]);
     }
 }

@@ -19,8 +19,12 @@
 
 namespace Gustav\Cache;
 
+use DateInterval;
+use DateTime;
+use DateTimeInterface;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\SimpleCache\CacheInterface;
 
 /**
  * This is a common interface for all our implementations of cache item pools.
@@ -29,7 +33,7 @@ use Psr\Cache\CacheItemPoolInterface;
  * @link   http://gustav.fieselschweif.de
  * @since  1.0
  */
-abstract class ACacheItemPool implements CacheItemPoolInterface
+abstract class ACacheItemPool implements CacheItemPoolInterface, CacheInterface
 {
     /**
      * This array contains all the saved data in this cache file. Each array
@@ -45,14 +49,14 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
     /**
      * The data to be saved later.
      * 
-     * @var \Gustav\Cache\CacheItem[]
+     * @var CacheItem[]
      */
     protected array $_deferred = [];
     
     /**
      * The configuration of this cache item pool.
      *
-     * @var \Gustav\Cache\Configuration
+     * @var Configuration
      */
     protected Configuration $_configuration;
     
@@ -61,7 +65,7 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
      *
      * @param array $data
      *   The data
-     * @param \Gustav\Cache\Configuration $configuration
+     * @param Configuration $configuration
      *   The configuration data to use in this session
      */
     public function __construct(array $data, Configuration $configuration)
@@ -71,7 +75,7 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
     }
     
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getItem($key): CacheItem
     {
@@ -92,9 +96,9 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
     }
     
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function getItems(array $keys = [])
+    public function getItems(array $keys = []): iterable
     {
         foreach($keys as $key) {
             yield $key => $this->getItem($key);
@@ -102,7 +106,7 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
     }
     
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function hasItem($key): bool
     {
@@ -111,16 +115,16 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
     }
     
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function clear(): bool
     {
-        $this->_data = array();
+        $this->_data = [];
         return $this->_persist();
     }
     
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function deleteItem($key): bool
     {
@@ -133,25 +137,18 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
     }
     
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function deleteItems(array $keys): bool
     {
-        foreach($keys as $key) {
-            $key = $this->_validateKey($key);
-            unset($this->_data[$key]);
-        }
-        return $this->_persist();
+        return $this->deleteMultiple($keys);
     }
     
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function save(CacheItemInterface $item): bool
     {
-        if(!$item instanceof CacheItem) {
-            return false;
-        }
         $this->_data[$item->getKey()] = [
             'value' => $item->get(),
             'expires' => $item->getExpiration()
@@ -160,7 +157,7 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
     }
     
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function saveDeferred(CacheItemInterface $item): bool
     {
@@ -172,7 +169,7 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
     }
     
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function commit(): bool
     {
@@ -191,12 +188,96 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
             return true;
         }
     }
-    
-    
+
+    /**
+     * @inheritDoc
+     */
+    public function get($key, $default = null)
+    {
+        if($this->hasItem($key)) {
+            return $this->getItem($key)->get();
+        }
+
+        return $default;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function set($key, $value, $ttl = null): bool
+    {
+        if($ttl instanceof DateInterval) {
+            $expires = (new DateTime("now"))->add($ttl);
+        } elseif(is_int($ttl)) {
+            $expires = new DateTime("now + {$ttl} seconds");
+        } else {
+            $expires = null;
+        }
+        return $this->save(new CacheItem($key, $value, true, $this, $expires));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function delete($key): bool
+    {
+        return $this->deleteItem($key);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getMultiple($keys, $default = null): iterable
+    {
+        foreach($keys as $key) {
+            yield $key => $this->get($key, $default);
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setMultiple($values, $ttl = null): bool
+    {
+        if($ttl instanceof DateInterval) {
+            $expires = (new DateTime("now"))->add($ttl);
+        } elseif(is_int($ttl)) {
+            $expires = new DateTime("now + {$ttl} seconds");
+        } else {
+            $expires = null;
+        }
+
+        $return = true;
+        foreach($values as $key => $value) {
+            $return = $return && $this->saveDeferred(new CacheItem($key, $value, true, $this, $expires));
+        }
+        return $return && $this->_persist();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function deleteMultiple($keys): bool
+    {
+        foreach($keys as $key) {
+            $key = $this->_validateKey($key);
+            unset($this->_data[$key]);
+        }
+        return $this->_persist();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function has($key): bool
+    {
+        return $this->hasItem($key);
+    }
+
     /**
      * Returns the configuration data of this cache item pool.
      *
-     * @return \Gustav\Cache\Configuration
+     * @return Configuration
      *   The configuration data
      */
     public function getConfiguration(): Configuration
@@ -207,15 +288,15 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
     /**
      * Returns the default expiration time of a new cache item.
      *
-     * @return \DateTimeInterface|null
+     * @return DateTimeInterface|null
      *   The expiration time
      */
-    public function getDefaultExpiration(): ?\DateTimeInterface
+    public function getDefaultExpiration(): ?DateTimeInterface
     {
         if($this->_configuration->getDefaultExpiration() == 0) {
             return null;
         } else {
-            return new \DateTime("now + " . $this->_configuration->getDefaultExpiration() . " seconds");
+            return new DateTime("now + " . $this->_configuration->getDefaultExpiration() . " seconds");
         }
     }
     
@@ -224,11 +305,11 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
      *
      * @param mixed $key
      * @return string
-     * @throws \Gustav\Cache\InvalidKeyException
+     * @throws InvalidKeyException
      */
     private function _validateKey($key): string 
     {
-        if(!\is_scalar($key) && !\is_object($key) && !\method_exists($key, "__toString")) {
+        if(!is_scalar($key) && !is_object($key) && !method_exists($key, "__toString")) {
             throw InvalidKeyException::invalidKey();
         }
         return (string) $key;
@@ -243,15 +324,12 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
      *
      * @param string $key
      *   The key to check for validity
-     * @return boolean
+     * @return bool
      *   true, if the data is expired, yet, otherwise false
      */
     private function _isExpired(string $key): bool
     {
-        if(
-            !\is_null($this->_data[$key]['expires']) &&
-            $this->_data[$key]['expires'] <= new \DateTime("now")
-        ) {
+        if(!is_null($this->_data[$key]['expires']) && $this->_data[$key]['expires'] <= new DateTime("now")) {
             unset($this->_data[$key]);
             return true;
         }
@@ -261,7 +339,7 @@ abstract class ACacheItemPool implements CacheItemPoolInterface
     /**
      * Saves this cache pool on file system.
      *
-     * @return boolean
+     * @return bool
      *   true, if saving was successful, otherwise false
      */
     abstract protected function _persist(): bool;

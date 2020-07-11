@@ -55,7 +55,7 @@ class CacheItemPool extends ACacheItemPool
      *   The timestamp of last update of the cache item pool's file
      * @param array $data
      *   The data
-     * @param \Gustav\Cache\Configuration $configuration
+     * @param Configuration $configuration
      *   Some configurations
      */
     public function __construct(string $filePath, int $lastUpdate, array $data, Configuration $configuration)
@@ -66,17 +66,17 @@ class CacheItemPool extends ACacheItemPool
     }
     
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     protected function _persist(): bool
     {
-        if(\file_exists($this->_filePath) && \filemtime($this->_filePath) > $this->_lastUpdate) {
+        if(file_exists($this->_filePath) && filemtime($this->_filePath) > $this->_lastUpdate) {
             return false;
         }
 
-        $contents = \serialize($this->_data);
-        if(\file_put_contents($this->_filePath, $contents) !== false) {
-            $this->_lastUpdate = \time();
+        $contents = serialize($this->_data);
+        if(file_put_contents($this->_filePath, $contents) !== false) {
+            $this->_lastUpdate = time();
             return true;
         }
         return false;
@@ -87,8 +87,8 @@ class CacheItemPool extends ACacheItemPool
      */
     public function __destruct()
     {
-        if(empty($this->_data) && \file_exists($this->_filePath) && \filemtime($this->_filePath) <= $this->_lastUpdate) {
-            \unlink($this->_filePath);
+        if(empty($this->_data) && file_exists($this->_filePath) && filemtime($this->_filePath) <= $this->_lastUpdate) {
+            unlink($this->_filePath);
         }
     }
 }

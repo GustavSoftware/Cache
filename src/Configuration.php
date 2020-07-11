@@ -59,9 +59,9 @@ class Configuration
     /**
      * The configuration data of the logger to use here.
      *
-     * @var \Gustav\Utils\Log\Configuration
+     * @var LogConfiguration
      */
-    private \Gustav\Utils\Log\Configuration $_logConfiguration;
+    private LogConfiguration $_logConfiguration;
 
     /**
      * Constructor of this class.
@@ -79,14 +79,14 @@ class Configuration
      *
      * @param string $className
      *   The class name of the implementation to use here
-     * @return \Gustav\Cache\Configuration
+     * @return self
      *   This object
-     * @throws \Gustav\Cache\CacheException
+     * @throws CacheException
      *   Invalid implementation
      */
-    public function setImplementation(string $className): Configuration 
+    public function setImplementation(string $className): self
     {
-        if(!\is_subclass_of($className, ACacheManager::class)) {
+        if(!is_subclass_of($className, ACacheManager::class)) {
             throw CacheException::invalidImplementation($className);
         }
         $this->_implementation = $className;
@@ -112,10 +112,10 @@ class Configuration
      *
      * @param string $dir
      *   The directory where to save the cache files
-     * @return \Gustav\Cache\Configuration
+     * @return self
      *   This object
      */
-    public function setDirectory(string $dir): Configuration 
+    public function setDirectory(string $dir): self
     {
         $this->_dir = $dir;
         return $this;
@@ -139,12 +139,12 @@ class Configuration
      * the cache items will not expire (if not set otherwise for the special
      * item).
      * 
-     * @param integer $seconds
+     * @param int $seconds
      *   The number of seconds until expiration
-     * @return \Gustav\Cache\Configuration
+     * @return self
      *   This object
      */
-    public function setDefaultExpiration(int $seconds = 0): Configuration 
+    public function setDefaultExpiration(int $seconds = 0): self
     {
         $this->_defaultExpiration = $seconds;
         return $this;
@@ -154,7 +154,7 @@ class Configuration
      * Returns the default time to live of a single cache item. If this value
      * is not greater than 0 the cache items will not expire.
      * 
-     * @return integer
+     * @return int
      *   The number of seconds until expiration
      */
     public function getDefaultExpiration(): int 
@@ -165,9 +165,9 @@ class Configuration
     /**
      * Sets the configuration of the logger to use here.
      *
-     * @param \Gustav\Utils\Log\Configuration $configuration
+     * @param LogConfiguration $configuration
      *   The new configuration data
-     * @return \Gustav\Cache\Configuration
+     * @return self
      *   This object
      */
     public function setLogConfiguration(LogConfiguration $configuration): self
@@ -179,7 +179,7 @@ class Configuration
     /**
      * Returns the configuration of the logger to use here.
      *
-     * @return \Gustav\Utils\Log\Configuration
+     * @return LogConfiguration
      *   The logger's configuration
      */
     public function getLogConfiguration(): LogConfiguration

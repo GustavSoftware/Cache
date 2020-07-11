@@ -19,6 +19,7 @@
 
 namespace Gustav\Cache;
 
+use Exception;
 use Gustav\Utils\GustavException;
 use Psr\Cache\CacheException as ICacheException;
 
@@ -34,7 +35,7 @@ use Psr\Cache\CacheException as ICacheException;
  * @link   http://gustav.fieselschweif.de
  * @since  1.0
  */
-class CacheException extends GustavException implements ICacheException
+class CacheException extends GustavException implements ICacheException, \Psr\SimpleCache\CacheException
 {
     /**
      * The possible error codes.
@@ -49,12 +50,12 @@ class CacheException extends GustavException implements ICacheException
      *
      * @param string $className
      *   The class name
-     * @param \Exception|null $previous
+     * @param Exception|null $previous
      *   Previous exception
-     * @return \Gustav\Cache\CacheException
+     * @return self
      *   The new exception
      */
-    public static function invalidImplementation(string $className, ?\Exception $previous = null): self
+    public static function invalidImplementation(string $className, ?Exception $previous = null): self
     {
         return new self("invalid class name: {$className}", self::INVALID_IMPLEMENTATION, $previous);
     }
@@ -65,12 +66,12 @@ class CacheException extends GustavException implements ICacheException
      *
      * @param string $fileName
      *   The file-name
-     * @param \Exception|null $previous
+     * @param Exception|null $previous
      *   Previous exception
-     * @return \Gustav\Cache\CacheException
+     * @return self
      *   The new exception
      */
-    public static function badFileName(string $fileName, ?\Exception $previous = null): self
+    public static function badFileName(string $fileName, ?Exception $previous = null): self
     {
         return new self("bad file name: {$fileName}", self::BAD_FILE_NAME, $previous);
     }
@@ -80,12 +81,12 @@ class CacheException extends GustavException implements ICacheException
      *
      * @param string $fileName
      *   The file-name
-     * @param \Exception|null $previous
+     * @param Exception|null $previous
      *   Previous exception
-     * @return \Gustav\Cache\CacheException
+     * @return self
      *   The new exception
      */
-    public static function fileUnreadable(string $fileName, ?\Exception $previous = null): self
+    public static function fileUnreadable(string $fileName, ?Exception $previous = null): self
     {
         return new self("cannot read file: {$fileName}", self::FILE_UNREADABLE, $previous);
     }

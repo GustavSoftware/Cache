@@ -36,21 +36,21 @@ use Psr\Cache\CacheItemPoolInterface;
 class CacheManager extends ACacheManager
 {
     /**
-     * @var \Gustav\Cache\Debug\CacheItemPool[]
+     * @var CacheItemPool[]
      */
     private array $_pools = [];
     
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function getItemPool(string $fileName, callable $creator = null): CacheItemPoolInterface
+    public function getItemPool(string $fileName, ?callable $creator = null): CacheItemPoolInterface
     {
         //already opened?
         if(isset($this->_pools[$fileName])) {
             return $this->_pools[$fileName];
         }
     
-        if(\mb_strpos($fileName, "..") !== false || \mb_strpos($fileName, "/") !== false) {
+        if(mb_strpos($fileName, "..") !== false || mb_strpos($fileName, "/") !== false) {
             throw CacheException::badFileName($fileName);
         }
     
@@ -65,5 +65,13 @@ class CacheManager extends ACacheManager
         );
         
         return $this->_pools[$fileName];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isOpened(string $fileName): bool
+    {
+        return isset($this->_pools[$fileName]);
     }
 }
